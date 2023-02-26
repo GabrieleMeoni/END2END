@@ -109,17 +109,17 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, split
             break
 
     # Images and labels for trains
-    X_train=np.zeros([len(labels) - (n_events_test + n_not_events_test), images[0].shape[0], images[0].shape[1],  images[0].shape[2]])
+    X_train=np.zeros([len(labels) - (n_events_test + n_not_events_test), images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
     y_train=np.zeros([len(labels) - (n_events_test + n_not_events_test)])
     # Images and labels for tests
-    X_test=np.zeros([n_events_test + n_not_events_test , images[0].shape[0], images[0].shape[1],  images[0].shape[2]])
+    X_test=np.zeros([n_events_test + n_not_events_test , images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
     y_test=np.zeros([n_events_test + n_not_events_test])
     
     #Number of selected images for train and tests
     n_train_selected=0
     n_test_selected=0
-    #Selecting train and labels images
 
+    #Perform splitting 
     for n, filename in enumerate(filenames):
         filename_dropped=filename.split(os.sep)[-1].split("_G")[0]
         if filename_dropped[-2] == "_":
