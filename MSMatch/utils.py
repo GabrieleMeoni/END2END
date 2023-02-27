@@ -2,6 +2,9 @@ import os, glob
 import time
 # from torch.utils.tensorboard import SummaryWriter
 from efficientnet_pytorch import EfficientNet
+import efficientnet_lite_pytorch
+from efficientnet_lite0_pytorch_model import EfficientnetLite0ModelFile
+
 import logging
 import numpy as np
 from sklearn.metrics import confusion_matrix
@@ -179,6 +182,28 @@ def net_builder(
             builder = getattr(net, "build_WideResNet")()
             setattr_cls_from_kwargs(builder, net_conf)
             return builder.build
+        elif "efficientnet-lite" in net_name:
+            if pretrained:
+                if net_name == "efficientnet-lite0":
+                    print("Using pretrained", net_name, "...")
+                    weights_path = EfficientnetLite0ModelFile.get_model_file_path()
+                    
+
+                    return lambda num_classes, in_channels: efficientnet_lite_pytorch.EfficientNet.from_pretrained(
+                        'efficientnet-lite0', weights_path = weights_path,num_classes=num_classes, in_channels=in_channels
+                        )
+                else:
+                    print("ERROR. Only efficientnet-lite0 pretrained is supported.")
+                    print("Using not pretrained model", net_name, "...")
+                    return lambda num_classes, in_channels: efficientnet_lite_pytorch.EfficientNet.from_name(
+                        net_name, num_classes=num_classes, in_channels=in_channels
+                    )
+
+            else:
+                print("Using not pretrained model", net_name, "...")
+                return lambda num_classes, in_channels: efficientnet_lite_pytorch.EfficientNet.from_name(
+                    net_name, num_classes=num_classes, in_channels=in_channels
+                )
         elif "efficientnet" in net_name:
             if pretrained:
                 print("Using pretrained", net_name, "...")
