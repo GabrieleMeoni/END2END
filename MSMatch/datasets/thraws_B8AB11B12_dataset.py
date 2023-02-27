@@ -10,6 +10,8 @@ import torch
 from tqdm import tqdm
 import pandas as pd 
 
+from .utils import upsample_ds
+
 class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
     """Thraws dataset"""
 
@@ -30,8 +32,9 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         self.transform = transform
         self.test_ratio = 0.1
         self.train = train
-        self.N = 4528
+        self.N = 0  # Modified to be inferred from data.
         self._load_data()
+        self.upsample_ratio = [1, 7]
 
     def _normalize_to_0_to_1(self, img):
         """Normalizes the passed image to 0 to 1
@@ -92,12 +95,20 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
             stratify=labels,
         )
 
+        # TODO: Add Upsample here.
+        UpsR = self.upsample_ratio
+        X_train, y_train = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=True)
+        X_test, y_test = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=True)
+
+
         if self.train:
             self.data = X_train
             self.targets = y_train
         else:
             self.data = X_test
             self.targets = y_test
+        
+        self.N = len(self.data)
 
     def __len__(self):
         return len(self.data)
