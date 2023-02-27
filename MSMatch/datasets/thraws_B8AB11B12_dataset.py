@@ -25,7 +25,10 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, split
         split_percentage_error_tolerance (float, optional): tolerance on the split percentage error. Defaults to 0.01.
 
     Returns:
-        _type_: _description_
+        np.array: train data 
+        np.array: test data
+        np.array: train labels
+        np.array: test labels
     """
     #Not events dictionaries 
     ##Fire not_event: locations - n_events dictionary
