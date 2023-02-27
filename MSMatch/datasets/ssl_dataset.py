@@ -103,13 +103,14 @@ class SSL_Dataset:
     and return BasicDataset: torch.utils.data.Dataset (see datasets.dataset.py)
     """
 
-    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42, upsample_ratio=[1,7]):
+    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42, upsample_event=7, upsample_notevent=1):
         """
         Args
             name: name of dataset in torchvision.datasets (cifar10, cifar100)
             train: True means the dataset is training dataset (default=True)
             data_dir: path of directory, where data is downloaed or stored.
             seed: seed to use for the train / test split. Not available for cifar which is presplit
+            upsample_ratio: ratio of notevent, event upsampling
         """
 
         self.name = name
@@ -118,7 +119,8 @@ class SSL_Dataset:
         self.data_dir = data_dir
         self.transform = get_transform(mean[name], std[name], train)
         self.inv_transform = get_inverse_transform(mean[name], std[name])
-        self.upsample_ratio = upsample_ratio
+        self.upsample_event = upsample_event
+        self.upsample_notevent = upsample_notevent
 
         self.use_ms_augmentations = False
         # need to use different augmentations for multispectral
@@ -142,7 +144,7 @@ class SSL_Dataset:
         elif self.name == "eurosat_ms":
             dset = EurosatDataset(train=self.train, seed=self.seed)
         elif self.name == "thraws_swir":
-            dset = ThrawsB8AB11B12Dataset(train=self.train, seed=self.seed, upsample_ratio=self.upsample_ratio)
+            dset = ThrawsB8AB11B12Dataset(train=self.train, seed=self.seed, upsample_ratio=[self.upsample_notevent, self.upsample_event])
             
 
         if self.name == "cifar10":

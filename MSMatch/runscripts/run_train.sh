@@ -3,7 +3,7 @@ export CUDA_VISIBLE_DEVICES=0
 DEVICE=0
 FIXMATCH_FOLDER="/data/PyDeepLearning/END2END/MSMatch/"
 SAVE_LOCATION="/data/PyDeepLearning/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_NAME="iter1"                             
+SAVE_NAME="iter2"                             
 DATASET="thraws_swir"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 NET=efficientnet-b0 #Options are wideResNet,efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
 UNLABELED_RATIO=4
@@ -21,8 +21,8 @@ URL_DIST="tcp://127.0.0.1:10007" #change port to avoid conflicts to allow multip
 mkdir -p $SAVE_LOCATION
 
 
-UPS_N=1
-UPS_M=1
+UPS_EVENT=5
+UPS_NOTEVENT=1
 
 NUM_LABELS_USED="600"
 
@@ -35,13 +35,13 @@ then
 	echo -e "${RED} Multi-GPU mode ${BLACK}"
 	for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 		#Remove "echo" to launch the script.
-		python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --N $UPS_N --M $UPS_M
+		python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --Upsample_event $UPS_EVENT --Upsample_event $UPS_NOTEVENT
 		wait
 	done
 else
 	for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 		#Remove "echo" to launch the script.
-		python train.py --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --N $UPS_N --M $UPS_M
+		python train.py --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --Upsample_event $UPS_EVENT --Upsample_event $UPS_NOTEVENT --overwrite
 		wait
 	done
 fi
