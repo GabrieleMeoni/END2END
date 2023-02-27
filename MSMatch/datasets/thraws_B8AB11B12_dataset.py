@@ -10,10 +10,12 @@ import torch
 from tqdm import tqdm
 import pandas as pd 
 
+from .utils import upsample_ds
+
 class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
     """Thraws dataset"""
 
-    def __init__(self, train, root_dir="DATA/warmup_events_dataset/", transform=None, seed=42):
+    def __init__(self, train, root_dir="/data/PyDeepLearning/END2END/MSMatch/DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=None):
         """
         Args:
             train (bool): If true returns training set, else test
@@ -21,8 +23,10 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
             seed (int): seed used for train/test split
+            upsample_ratio (list): ratio of event, notevent upsampling
         """
         self.seed = seed
+        self.upsample_ratio = upsample_ratio
         self.size = [256, 256]
         self.num_channels = 3
         self.num_classes = 2
@@ -30,7 +34,8 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         self.transform = transform
         self.test_ratio = 0.1
         self.train = train
-        self.N = 4528
+        self.N = 4528  # Modified to be inferred from data.
+        self.upsample_ratio = upsample_ratio
         self._load_data()
 
     def _normalize_to_0_to_1(self, img):
@@ -92,12 +97,21 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
             stratify=labels,
         )
 
+        # TODO: Add Upsample here.
+        if self.upsample_ratio is not None:
+            NE, EV = self.upsample_ratio
+            X_train, y_train = upsample_ds(ds=X_train, lb=y_train, NotEvent=NE, Event=EV)
+            X_test, y_test = upsample_ds(ds=X_test, lb=y_test, NotEvent=NE, Event=EV)
+
+
         if self.train:
             self.data = X_train
             self.targets = y_train
         else:
             self.data = X_test
             self.targets = y_test
+        
+        self.N = int(X_train.shape[0]+X_test.shape[0])
 
     def __len__(self):
         return len(self.data)
