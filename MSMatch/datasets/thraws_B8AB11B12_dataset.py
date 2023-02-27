@@ -110,10 +110,10 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, split
 
     # Images and labels for trains
     X_train=np.zeros([len(labels) - (n_events_test + n_not_events_test), images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
-    y_train=np.zeros([len(labels) - (n_events_test + n_not_events_test)])
+    y_train=np.zeros([len(labels) - (n_events_test + n_not_events_test)], dtype='int64')
     # Images and labels for tests
     X_test=np.zeros([n_events_test + n_not_events_test , images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
-    y_test=np.zeros([n_events_test + n_not_events_test])
+    y_test=np.zeros([n_events_test + n_not_events_test],dtype='int64')
     
     #Number of selected images for train and tests
     n_train_selected=0
