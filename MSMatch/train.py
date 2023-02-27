@@ -117,7 +117,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # Construct Dataset
     train_dset = SSL_Dataset(
-        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, upsample_event=args.Upsample_event,upsample_notevent=args.Upsample_notevent,
+        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
     )
     lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
 
@@ -125,7 +125,7 @@ def main_worker(gpu, ngpus_per_node, args):
     args.num_channels = train_dset.num_channels
 
     _eval_dset = SSL_Dataset(
-        name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, upsample_event=args.Upsample_event,upsample_notevent=args.Upsample_notevent,
+        name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
     )
     eval_dset = _eval_dset.get_dset()
 
@@ -271,8 +271,10 @@ if __name__ == "__main__":
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--load_path", type=str, default=None)
     parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--Upsample_event", type=int, default=7)
-    parser.add_argument("--Upsample_notevent", type=int, default=1)
+    parser.add_argument("--train_upsample_event", type=int, default=5)
+    parser.add_argument("--train_upsample_notevent", type=int, default=1)
+    parser.add_argument("--eval_upsample_event", type=int, default=1)
+    parser.add_argument("--eval_upsample_notevent", type=int, default=1)
 
     """
     Training Configuration of FixMatch
