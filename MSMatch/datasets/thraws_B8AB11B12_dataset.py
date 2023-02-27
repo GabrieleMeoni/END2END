@@ -15,7 +15,7 @@ from .utils import upsample_ds
 class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
     """Thraws dataset"""
 
-    def __init__(self, train, root_dir="DATA/warmup_events_dataset/", transform=None, seed=42):
+    def __init__(self, train, root_dir="DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=[1,7]):
         """
         Args:
             train (bool): If true returns training set, else test
@@ -23,6 +23,7 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
             seed (int): seed used for train/test split
+            upsample_ratio (list): ratio of event, notevent upsampling
         """
         self.seed = seed
         self.size = [256, 256]
@@ -34,7 +35,7 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         self.train = train
         self.N = 0  # Modified to be inferred from data.
         self._load_data()
-        self.upsample_ratio = [1, 7]
+        self.upsample_ratio = upsample_ratio
 
     def _normalize_to_0_to_1(self, img):
         """Normalizes the passed image to 0 to 1

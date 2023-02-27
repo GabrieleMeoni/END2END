@@ -117,7 +117,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # Construct Dataset
     train_dset = SSL_Dataset(
-        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed,
+        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, upsample_ratio=[args.N,args.M],
     )
     lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
 
@@ -271,6 +271,8 @@ if __name__ == "__main__":
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--load_path", type=str, default=None)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--N", type=int, default=1)
+    parser.add_argument("--M", type=int, default=7)
 
     """
     Training Configuration of FixMatch

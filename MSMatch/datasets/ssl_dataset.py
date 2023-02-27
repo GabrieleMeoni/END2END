@@ -103,7 +103,7 @@ class SSL_Dataset:
     and return BasicDataset: torch.utils.data.Dataset (see datasets.dataset.py)
     """
 
-    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42):
+    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42, upsample_ratio=[1,7]):
         """
         Args
             name: name of dataset in torchvision.datasets (cifar10, cifar100)
@@ -118,6 +118,7 @@ class SSL_Dataset:
         self.data_dir = data_dir
         self.transform = get_transform(mean[name], std[name], train)
         self.inv_transform = get_inverse_transform(mean[name], std[name])
+        self.upsample_ratio = upsample_ratio
 
         self.use_ms_augmentations = False
         # need to use different augmentations for multispectral
@@ -141,7 +142,7 @@ class SSL_Dataset:
         elif self.name == "eurosat_ms":
             dset = EurosatDataset(train=self.train, seed=self.seed)
         elif self.name == "thraws_swir":
-            dset = ThrawsB8AB11B12Dataset(train=self.train, seed=self.seed)
+            dset = ThrawsB8AB11B12Dataset(train=self.train, seed=self.seed, upsample_ratio=self.upsample_ratio)
             
 
         if self.name == "cifar10":
