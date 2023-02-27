@@ -14,7 +14,7 @@ import random
 from copy import deepcopy
 import numpy as np
 
-def geographical_splitter(images, labels, filenames, test_size_percentage, split_percentage_error_tolerance=0.01):
+def geographical_splitter(images, labels, filenames, test_size_percentage, seed=42, split_percentage_error_tolerance=0.01):
     """Splits the events according to a geographical position. In this way, patches related to a specific area can be only in train or validation. 
 
     Args:
@@ -22,6 +22,7 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, split
         labels (np.array): list of labels to split.
         filenames (list): file names of the different images.
         test_size_percentage (float): split perecentage.
+        seed (int, optional): seed for reproducibility. Defaults to 42.
         split_percentage_error_tolerance (float, optional): tolerance on the split percentage error. Defaults to 0.01.
 
     Returns:
@@ -49,6 +50,8 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, split
         fires_events_keys_shuffled=deepcopy(list(fire_events_locations_dict.keys()))
         volcanoes_not_events_keys_shuffled=deepcopy(list(volcano_not_events_locations_dict.keys()))
         fires_not_events_keys_shuffled=deepcopy(list(fire_not_events_locations_dict.keys()))
+        # Fixing seed to ensure that dataset train and test will be splitted in the same way into different iterations
+        random.seed(seed)
 
         random.shuffle(volcanoes_events_keys_shuffled)
         random.shuffle(fires_events_keys_shuffled)
@@ -224,7 +227,7 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         #    stratify=labels,
         #)
         filenames_sorted=sorted(filenames)
-        X_train, X_test, y_train, y_test = geographical_splitter(images, labels, filenames_sorted, self.test_ratio)
+        X_train, X_test, y_train, y_test = geographical_splitter(images, labels, filenames_sorted, self.test_ratio, self.seed)
         if self.train:
             self.data = X_train
             self.targets = y_train
