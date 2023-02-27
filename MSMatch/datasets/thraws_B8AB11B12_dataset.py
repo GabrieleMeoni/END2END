@@ -15,7 +15,7 @@ from .utils import upsample_ds
 class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
     """Thraws dataset"""
 
-    def __init__(self, train, root_dir="DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=[1,7]):
+    def __init__(self, train, root_dir="/data/PyDeepLearning/END2END/MSMatch/DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=[1,7]):
         """
         Args:
             train (bool): If true returns training set, else test
@@ -26,6 +26,7 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
             upsample_ratio (list): ratio of event, notevent upsampling
         """
         self.seed = seed
+        self.upsample_ratio = upsample_ratio
         self.size = [256, 256]
         self.num_channels = 3
         self.num_classes = 2
@@ -33,9 +34,8 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         self.transform = transform
         self.test_ratio = 0.1
         self.train = train
-        self.N = 0  # Modified to be inferred from data.
+        self.N = 4528  # Modified to be inferred from data.
         self._load_data()
-        self.upsample_ratio = upsample_ratio
 
     def _normalize_to_0_to_1(self, img):
         """Normalizes the passed image to 0 to 1
@@ -98,8 +98,8 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
 
         # TODO: Add Upsample here.
         UpsR = self.upsample_ratio
-        X_train, y_train = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=True)
-        X_test, y_test = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=True)
+        X_train, y_train = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=False)
+        X_test, y_test = upsample_ds(ds=X_train, lb=y_train, N=UpsR[0], M=UpsR[1], tol=100, recursive=False)
 
 
         if self.train:

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def upsample_ds(ds, lb, N, M, tol, recursive=True):
+def upsample_ds(ds, lb, N, M, tol, recursive=False):
        X_train_new, y_train_new = [], []
        total_events = lb.sum()
        for img, label in zip(ds, lb):
