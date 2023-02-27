@@ -21,3 +21,4 @@ dependencies:
 - scipy
 - numpy=1.23.4
 - imgaug
+- nb_conda_kernels
