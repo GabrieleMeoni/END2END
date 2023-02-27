@@ -1,3 +1,6 @@
 *.zip
 *.pyc
 *.pkl
+MSMatch/checkpoints/iter1/thraws_swir/FixMatch_archefficientnet-b0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels600_optSGD/model_best.pth
+MSMatch/checkpoints/iter1/thraws_swir/FixMatch_archefficientnet-b0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels600_optSGD/events.out.tfevents.1677238963.unina.317444.0
+MSMatch/checkpoints/iter1/thraws_swir/FixMatch_archefficientnet-b0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels600_optSGD/log.txt
