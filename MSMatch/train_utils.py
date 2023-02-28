@@ -177,7 +177,7 @@ def accuracy(output, target, topk=(1,)):
 def mcc(output, target, num_classes=2):
     """
     Computes the Matthews Correlation Coefficient.
-    
+
     Args
         output: logits or probs (num of batch, num of classes)
         target: (num of batch, 1) or (num of batch, )
@@ -186,19 +186,9 @@ def mcc(output, target, num_classes=2):
     """
     mcc = MatthewsCorrCoef(num_classes=num_classes)
     with torch.no_grad():
-        maxk = max((1,))  # get k in top-k
-        batch_size = target.size(0)  # get batch size of target
-
-        # torch.topk(input, k, dim=None, largest=True, sorted=True, out=None)
-        # return: value, index
-        _, pred = output.topk(
-            k=maxk, dim=1, largest=True, sorted=True
-        )  # pred: [num of batch, k]
-        pred = pred.t()  # pred: [k, num of batch]
-
-        
-        # np.shape(res): [k, 1]
-        return mcc(pred, target)
+        pred_c=torch.argmax(output, axis=0)
+        target_c=torch.argmax(target, axis=0)
+    return mcc(pred_c, target_c)
 
 def ce_loss(logits, targets, use_hard_labels=True, reduction="none"):
     """

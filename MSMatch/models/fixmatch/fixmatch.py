@@ -30,6 +30,7 @@ class FixMatch:
         num_eval_iter=1000,
         tb_log=None,
         logger=None,
+        use_mcc_for_best=False
     ):
         """
         class Fixmatch contains setter of data_loader, optimizer, and model update methods.
@@ -46,6 +47,7 @@ class FixMatch:
             num_eval_iter: freqeuncy of iteration (after 500,000 iters)
             tb_log: tensorboard writer (see train_utils.py)
             logger: logger (see utils.py)
+            use_mcc_for_best : if True, model with best mcc metrics is kept. Otherwise, accuracy.
         """
 
         super(FixMatch, self).__init__()
@@ -138,7 +140,10 @@ class FixMatch:
         )
 
         start_batch.record()
-        best_eval_acc, best_it = 0.0, 0
+        if self.use_mcc_for_best:
+            best_eval_acc, best_it = 0.0, 0
+        else:
+            best_eval_mcc, best_it = 0.0, 0
 
         scaler = GradScaler()
         amp_cm = autocast if args.amp else contextlib.nullcontext
@@ -237,13 +242,20 @@ class FixMatch:
 
                 save_path = os.path.join(args.save_dir, args.save_name)
 
-                if tb_dict["eval/top-1-acc"] > best_eval_acc:
-                    best_eval_acc = tb_dict["eval/top-1-acc"]
-                    best_it = self.it
+                if self.use_mcc_for_best:
+                    if tb_dict["eval/mcc"] > best_eval_mcc:
+                        best_eval_mcc = tb_dict["eval/mcc"]
+                        best_it = self.it
+                    self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters")
 
-                self.print_fn(
-                    f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters"
-                )
+                else:
+                    if tb_dict["eval/accuracy"] > best_eval_acc:
+                        best_eval_acc = tb_dict["eval/accuracy"]
+                        best_it = self.it
+                    
+                    self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters")
+
+                
 
                 progressbar = tqdm(
                     desc=f"Epoch {curr_epoch}/{total_epochs}", total=args.num_eval_iter
@@ -282,6 +294,7 @@ class FixMatch:
         total_loss = 0.0
         total_acc = 0.0
         total_num = 0.0
+        n=0
         for x, y in eval_loader:
             x, y = x.cuda(args.gpu), y.cuda(args.gpu)
             num_batch = x.shape[0]
@@ -292,13 +305,21 @@ class FixMatch:
 
             total_loss += loss.detach() * num_batch
             total_acc += acc.detach()
-
+            if n == 0:
+                pred=logits
+                correct=y
+                n+=1
+            else:
+                pred=torch.stack((pred, logits), axis=1)
+                correct=torch.stack((correct, y), axis=1)
+                
         if not use_ema:
             eval_model.train()
 
         return {
             "eval/loss": total_loss / total_num,
             "eval/top-1-acc": total_acc / total_num,
+            "eval/mcc" : mcc(pred, correct, self.num_classes)
         }
 
     def save_model(self, save_name, save_path):
