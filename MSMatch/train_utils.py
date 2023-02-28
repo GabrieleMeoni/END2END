@@ -2,6 +2,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 import torch.nn.functional as F
+from torchmetrics import MatthewsCorrCoef
 
 import math
 import time
@@ -173,6 +174,31 @@ def accuracy(output, target, topk=(1,)):
         # np.shape(res): [k, 1]
         return res
 
+def mcc(output, target, num_classes=2):
+    """
+    Computes the Matthews Correlation Coefficient.
+    
+    Args
+        output: logits or probs (num of batch, num of classes)
+        target: (num of batch, 1) or (num of batch, )
+        num_classes: int (number of classes)
+    refer: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.matthews_corrcoef.html
+    """
+    mcc = MatthewsCorrCoef(num_classes=num_classes)
+    with torch.no_grad():
+        maxk = max((1,))  # get k in top-k
+        batch_size = target.size(0)  # get batch size of target
+
+        # torch.topk(input, k, dim=None, largest=True, sorted=True, out=None)
+        # return: value, index
+        _, pred = output.topk(
+            k=maxk, dim=1, largest=True, sorted=True
+        )  # pred: [num of batch, k]
+        pred = pred.t()  # pred: [k, num of batch]
+
+        
+        # np.shape(res): [k, 1]
+        return mcc(pred, target)
 
 def ce_loss(logits, targets, use_hard_labels=True, reduction="none"):
     """
@@ -190,3 +216,5 @@ def ce_loss(logits, targets, use_hard_labels=True, reduction="none"):
         log_pred = F.log_softmax(logits, dim=-1)
         nll_loss = torch.sum(-targets * log_pred, dim=1)
         return nll_loss
+    
+
