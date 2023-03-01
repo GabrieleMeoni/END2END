@@ -157,6 +157,7 @@ def main_worker(gpu, ngpus_per_node, args):
         num_eval_iter=args.num_eval_iter,
         tb_log=tb_log,
         logger=logger,
+        use_mcc_for_best=args.use_mcc_for_best
     )
 
     logger.info(f"Number of Trainable Params: {count_parameters(model.train_model)}")
@@ -271,6 +272,7 @@ if __name__ == "__main__":
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--load_path", type=str, default=None)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--use_mcc_for_best", action="store_true")
     parser.add_argument("--train_upsample_event", type=int, default=5)
     parser.add_argument("--train_upsample_notevent", type=int, default=1)
     parser.add_argument("--eval_upsample_event", type=int, default=1)
