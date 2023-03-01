@@ -18,6 +18,8 @@ from models.fixmatch.fixmatch import FixMatch
 from datasets.ssl_dataset import SSL_Dataset
 from datasets.data_utils import get_data_loader
 
+#THRAWS_SWIR supported seeds between 0 and 50.
+THRAWS_SWIR_SUPPORTED_SEEDS=[0, 6, 8, 11, 19, 21, 25, 28, 35, 46, 47]
 
 def main(args):
     """
@@ -58,6 +60,8 @@ def main(args):
             "disable data parallelism."
         )
 
+    
+    
     if args.dist_url == "env://" and args.world_size == -1:
         args.world_size = int(os.environ["WORLD_SIZE"])
 
@@ -83,7 +87,13 @@ def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
     # random seed has to be set for the syncronization of labeled data sampling in each process.
+
     assert args.seed is not None
+
+    #Checking supported seed 
+    if args.dataset == "thraws_swir"  and not(args.seed in THRAWS_SWIR_SUPPORTED_SEEDS):
+        raise ValueError("The seed: "+args.seed+" is not supported when dataset thraws_swir is used. \nList of supported seed:", THRAWS_SWIR_SUPPORTED_SEEDS)
+    
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)

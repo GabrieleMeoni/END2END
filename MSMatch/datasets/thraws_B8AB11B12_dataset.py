@@ -43,81 +43,81 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, seed=
     ## Volcanoes event: locations - n_events dictionary
     volcano_events_locations_dict={'Barren_Island': 8, 'Chillan_Nevados_de': 4, 'Copahue': 2, 'Etna': 15, 'Fuego': 14, 'Karangetang': 1, 'Krysuvik-Trolladyngja': 14, 'La_Palma': 8, 'Mayon': 7, 'Nyamulagira': 25, 'Piton_de_la_Fournaise': 17, 'Poas': 3, 'Raung': 28, 'San_Miguel': 42, 'Sangay': 10, 'Santa_Maria': 7, 'Stromboli': 2, 'Telica': 4, 'Tinakula': 3}
     
-    while(1):
-        volcanoes_events_keys_shuffled=deepcopy(list(volcano_events_locations_dict.keys()))
-        fires_events_keys_shuffled=deepcopy(list(fire_events_locations_dict.keys()))
-        volcanoes_not_events_keys_shuffled=deepcopy(list(volcano_not_events_locations_dict.keys()))
-        fires_not_events_keys_shuffled=deepcopy(list(fire_not_events_locations_dict.keys()))
-        # Fixing seed to ensure that dataset train and test will be splitted in the same way into different iterations
-        random.seed(seed)
+    
+    volcanoes_events_keys_shuffled=deepcopy(list(volcano_events_locations_dict.keys()))
+    fires_events_keys_shuffled=deepcopy(list(fire_events_locations_dict.keys()))
+    volcanoes_not_events_keys_shuffled=deepcopy(list(volcano_not_events_locations_dict.keys()))
+    fires_not_events_keys_shuffled=deepcopy(list(fire_not_events_locations_dict.keys()))
+    # Fixing seed to ensure that dataset train and test will be splitted in the same way into different iterations
+    random.seed(seed)
 
-        random.shuffle(volcanoes_events_keys_shuffled)
-        random.shuffle(fires_events_keys_shuffled)
-        random.shuffle(volcanoes_not_events_keys_shuffled)
-        random.shuffle(fires_not_events_keys_shuffled)
+    random.shuffle(volcanoes_events_keys_shuffled)
+    random.shuffle(fires_events_keys_shuffled)
+    random.shuffle(volcanoes_not_events_keys_shuffled)
+    random.shuffle(fires_not_events_keys_shuffled)
 
-        # Number of total events
-        n_events=np.sum(np.array([n for n in fire_events_locations_dict.values()]+[n for n in volcano_events_locations_dict.values()]))
-        # Number of total nonevents
-        n_not_events=np.sum(np.array([n for n in fire_not_events_locations_dict.values()]+[n for n in volcano_not_events_locations_dict.values()]))
+    # Number of total events
+    n_events=np.sum(np.array([n for n in fire_events_locations_dict.values()]+[n for n in volcano_events_locations_dict.values()]))
+    # Number of total nonevents
+    n_not_events=np.sum(np.array([n for n in fire_not_events_locations_dict.values()]+[n for n in volcano_not_events_locations_dict.values()]))
 
-        #Maximum number of events in tests
-        n_events_test_max=int(test_size_percentage * n_events)
+    #Maximum number of events in tests
+    n_events_test_max=int(test_size_percentage * n_events)
 
-        #Number of events in tests
-        n_events_test=0
+    #Number of events in tests
+    n_events_test=0
 
-        #Currernt labels for volcano e fires
-        volcano_label_idx=0
-        fire_label_idx=0
+    #Currernt labels for volcano e fires
+    volcano_label_idx=0
+    fire_label_idx=0
 
-        #List of events location in test
-        events_locations_tests_list=[]
-        n_events_list=[]
-        while(n_events_test < n_events_test_max):
-            n_events_test+=volcano_events_locations_dict[volcanoes_events_keys_shuffled[volcano_label_idx]]
-            n_events_list.append(volcano_events_locations_dict[volcanoes_events_keys_shuffled[volcano_label_idx]])
-            events_locations_tests_list.append(volcanoes_events_keys_shuffled[volcano_label_idx])
-            volcano_label_idx+=1
+    #List of events location in test
+    events_locations_tests_list=[]
+    n_events_list=[]
+    while(n_events_test < n_events_test_max):
+        n_events_test+=volcano_events_locations_dict[volcanoes_events_keys_shuffled[volcano_label_idx]]
+        n_events_list.append(volcano_events_locations_dict[volcanoes_events_keys_shuffled[volcano_label_idx]])
+        events_locations_tests_list.append(volcanoes_events_keys_shuffled[volcano_label_idx])
+        volcano_label_idx+=1
 
-            if(n_events_test < n_events_test_max):
-                n_events_test+=fire_events_locations_dict[fires_events_keys_shuffled[fire_label_idx]]
-                n_events_list.append(fire_events_locations_dict[fires_events_keys_shuffled[fire_label_idx]])
-                events_locations_tests_list.append(fires_events_keys_shuffled[fire_label_idx])
-                fire_label_idx+=1    
+        if(n_events_test < n_events_test_max):
+            n_events_test+=fire_events_locations_dict[fires_events_keys_shuffled[fire_label_idx]]
+            n_events_list.append(fire_events_locations_dict[fires_events_keys_shuffled[fire_label_idx]])
+            events_locations_tests_list.append(fires_events_keys_shuffled[fire_label_idx])
+            fire_label_idx+=1    
 
-        #Maximum number of nonevents in tests
-        n_not_events_test_max=int(test_size_percentage * n_not_events)
+    #Maximum number of nonevents in tests
+    n_not_events_test_max=int(test_size_percentage * n_not_events)
 
-        #List of nonevents location in test
-        n_not_events_test=0
-        volcano_label_idx=0
-        fire_label_idx=0
-        n_non_events_list=[]
-        not_events_locations_tests_list=[]
-        while(n_not_events_test < n_not_events_test_max):
-            n_not_events_test+=volcano_not_events_locations_dict[volcanoes_not_events_keys_shuffled[volcano_label_idx]]
-            n_non_events_list.append(volcano_not_events_locations_dict[volcanoes_not_events_keys_shuffled[volcano_label_idx]])
-            not_events_locations_tests_list.append(volcanoes_not_events_keys_shuffled[volcano_label_idx])
-            volcano_label_idx+=1
+    #List of nonevents location in test
+    n_not_events_test=0
+    volcano_label_idx=0
+    fire_label_idx=0
+    n_non_events_list=[]
+    not_events_locations_tests_list=[]
+    while(n_not_events_test < n_not_events_test_max):
+        n_not_events_test+=volcano_not_events_locations_dict[volcanoes_not_events_keys_shuffled[volcano_label_idx]]
+        n_non_events_list.append(volcano_not_events_locations_dict[volcanoes_not_events_keys_shuffled[volcano_label_idx]])
+        not_events_locations_tests_list.append(volcanoes_not_events_keys_shuffled[volcano_label_idx])
+        volcano_label_idx+=1
 
-            if(n_not_events_test < n_not_events_test_max):
-                n_not_events_test+=fire_not_events_locations_dict[fires_not_events_keys_shuffled[fire_label_idx]]
-                not_events_locations_tests_list.append(fires_not_events_keys_shuffled[fire_label_idx])
-                n_non_events_list.append(fire_not_events_locations_dict[fires_not_events_keys_shuffled[fire_label_idx]])
-                fire_label_idx+=1 
-        
-        real_percentage=(n_events_test + n_not_events_test)/len(labels)
-        
-        if real_percentage - test_size_percentage <= split_percentage_error_tolerance:
-            break
+        if(n_not_events_test < n_not_events_test_max):
+            n_not_events_test+=fire_not_events_locations_dict[fires_not_events_keys_shuffled[fire_label_idx]]
+            not_events_locations_tests_list.append(fires_not_events_keys_shuffled[fire_label_idx])
+            n_non_events_list.append(fire_not_events_locations_dict[fires_not_events_keys_shuffled[fire_label_idx]])
+            fire_label_idx+=1 
+    
+    real_percentage=(n_events_test + n_not_events_test)/len(labels)
+    
+    if real_percentage - test_size_percentage > split_percentage_error_tolerance:
+        raise ValueError("Impossible to perform datatest TRAIN/EVAL " + str(test_size_percentage) +" splitting with tolerance: " +str(split_percentage_error_tolerance * 100)+" % by using SEED: "+str(seed)+". Try to change seed.")
 
     # Images and labels for trains
     X_train=np.zeros([len(labels) - (n_events_test + n_not_events_test), images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
     y_train=np.zeros([len(labels) - (n_events_test + n_not_events_test)], dtype='int64')
     # Images and labels for tests
     X_test=np.zeros([n_events_test + n_not_events_test , images[0].shape[0], images[0].shape[1],  images[0].shape[2]], dtype=np.uint8)
-    y_test=np.zeros([n_events_test + n_not_events_test], dtype='int64')
+    y_test=np.zeros([n_events_test + n_not_events_test],dtype='int64')
     
     #Number of selected images for train and tests
     n_train_selected=0
@@ -148,7 +148,7 @@ from .utils import upsample_ds
 class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
     """Thraws dataset"""
 
-    def __init__(self, train, root_dir="/data/PyDeepLearning/END2END/MSMatch/DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=None):
+    def __init__(self, train, root_dir="./DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=None):
         """
         Args:
             train (bool): If true returns training set, else test
