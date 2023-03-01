@@ -56,6 +56,7 @@ class FixMatch:
         self.loader = {}
         self.num_classes = num_classes
         self.ema_m = ema_m
+        self.use_mcc_for_best=use_mcc_for_best
 
         # create the encoders
         # network is builded only by num_classes,
@@ -141,9 +142,9 @@ class FixMatch:
 
         start_batch.record()
         if self.use_mcc_for_best:
-            best_eval_acc, best_it = 0.0, 0
-        else:
             best_eval_mcc, best_it = 0.0, 0
+        else:
+            best_eval_acc, best_it = 0.0, 0
 
         scaler = GradScaler()
         amp_cm = autocast if args.amp else contextlib.nullcontext
@@ -211,7 +212,7 @@ class FixMatch:
                 self._eval_model_update()
                 train_accuracy = accuracy(logits_x_lb, y_lb)
                 train_accuracy = train_accuracy[0]
-                train_mcc = mcc(logits_x_lb, y_lb, self.num_classes)
+                train_mcc = mcc(logits_x_lb, y_lb)
 
             end_run.record()
             torch.cuda.synchronize()
@@ -249,8 +250,8 @@ class FixMatch:
                     self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters")
 
                 else:
-                    if tb_dict["eval/accuracy"] > best_eval_acc:
-                        best_eval_acc = tb_dict["eval/accuracy"]
+                    if tb_dict["eval/top-1-acc"] > best_eval_acc:
+                        best_eval_acc = tb_dict["eval/top-1-acc"]
                         best_it = self.it
                     
                     self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters")
@@ -319,7 +320,7 @@ class FixMatch:
         return {
             "eval/loss": total_loss / total_num,
             "eval/top-1-acc": total_acc / total_num,
-            "eval/mcc" : mcc(pred, correct, self.num_classes)
+            "eval/mcc" : mcc(pred, correct)
         }
 
     def save_model(self, save_name, save_path):

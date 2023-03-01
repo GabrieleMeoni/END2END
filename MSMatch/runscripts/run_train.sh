@@ -5,7 +5,7 @@ FIXMATCH_FOLDER="/data/PyDeepLearning/END2END/MSMatch/"
 SAVE_LOCATION="/data/PyDeepLearning/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
 SAVE_NAME="iter2"                             
 DATASET="thraws_swir"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
-NET=efficientnet-b0 #Options are wideResNet,efficientnet-lite0, efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
+NET=efficientnet-lite0 #Options are wideResNet,efficientnet-lite0, efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
 UNLABELED_RATIO=4
 BATCH_SIZE=8
 N_EPOCH=500                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
@@ -23,7 +23,7 @@ mkdir -p $SAVE_LOCATION
 #Upsampling values.
 TRAIN_UPS_EVENT=5
 TRAIN_UPS_NOTEVENT=1
-EVAL_UPS_EVENT=5
+EVAL_UPS_EVENT=1
 EVAL_UPS_NOTEVENT=1
 
 NUM_LABELS_USED="600"
