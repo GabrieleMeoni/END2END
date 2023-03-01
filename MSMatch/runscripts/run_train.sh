@@ -20,7 +20,7 @@ URL_DIST="tcp://127.0.0.1:10007" #change port to avoid conflicts to allow multip
 #create save location
 mkdir -p $SAVE_LOCATION
 
-
+#Upsampling values.
 TRAIN_UPS_EVENT=5
 TRAIN_UPS_NOTEVENT=1
 EVAL_UPS_EVENT=1
