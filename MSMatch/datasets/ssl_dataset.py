@@ -10,7 +10,8 @@ from .ucm_dataset import UCMDataset
 from .aid_dataset import AIDDataset
 from .eurosat_rgb_dataset import EurosatRGBDataset
 from .eurosat_dataset import EurosatDataset
-from .thraws_B8AB11B12_dataset import ThrawsB8AB11B12Dataset
+from .thraws_train_dataset import THRAWS_train_dataset
+from .thraws_test_dataset import THRAWS_test_dataset
 
 
 import torchvision
@@ -41,9 +42,11 @@ mean["eurosat_ms"] = [
     ]
 ]
 
-mean['thraws_swir']=[0,0,0] # zero mean
+mean['thraws_swir_train']=[0,0,0] # zero mean
+mean['thraws_swir_test']=[0,0,0] # zero mean
 # std['thraws_swir']=[(2**8)-1,(2**8)-1,(2**8)-1] # 8 bit sampling
-std['thraws_swir']=[1,1,1] # 8 bit sampling
+std['thraws_swir_train']=[1,1,1] # 8 bit sampling
+std['thraws_swir_test']=[1,1,1] # 8 bit sampling
 
 std["cifar10"] = [x / 255 for x in [63.0, 62.1, 66.7]]
 std["cifar100"] = [x / 255 for x in [68.2, 65.4, 70.4]]
@@ -143,9 +146,11 @@ class SSL_Dataset:
             dset = EurosatRGBDataset(train=self.train, seed=self.seed)
         elif self.name == "eurosat_ms":
             dset = EurosatDataset(train=self.train, seed=self.seed)
-        elif self.name == "thraws_swir":
-            dset = ThrawsB8AB11B12Dataset(train=self.train, seed=self.seed, upsample_ratio=[self.upsample_notevent, self.upsample_event])
-            
+        elif self.name == "thraws_swir_train":
+            dset = THRAWS_train_dataset(train=self.train, seed=self.seed, upsample_ratio=[self.upsample_notevent, self.upsample_event])
+        elif self.name == "thraws_swir_test":
+            dset = THRAWS_test_dataset()
+        
 
         if self.name == "cifar10":
             self.label_encoding = None

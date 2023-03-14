@@ -1,4 +1,3 @@
-import imageio
 import numpy as np
 import os
 from PIL import Image
@@ -31,19 +30,19 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, seed=
     """
     #Not events dictionaries 
     ##Fire not_event: locations - n_events dictionary
-    fire_not_events_locations_dict={'Bolivia': 174, 'France': 28, 'Greece': 288, 'Greenland': 14, 'Italy': 54, 'Kenya': 19, 'Latvia': 155, 'Mexico': 121, 'Spain': 99, 'Sweden': 97, 'Ukraine': 49}
+    fire_not_events_locations_dict = {'Bolivia': 189, 'France': 32, 'Greece': 323, 'Greenland': 14, 'Italy': 58, 'Kenya': 20, 'Latvia': 175, 'Mexico': 134, 'Spain': 111, 'Sweden': 105}
 
     ## Volcanoes not_event: locations - n_events dictionary
-    volcano_not_events_locations_dict={'Barren_Island': 146, 'Chillan_Nevados_de': 76, 'Copahue': 77, 'Etna': 232, 'Fuego': 172, 'Karangetang': 40, 'Krysuvik-Trolladyngja': 209, 'La_Palma': 70, 'Mayon': 67, 'Nyamulagira': 489, 'Piton_de_la_Fournaise': 310, 'Poas': 96, 'Raung': 248, 'San_Miguel': 271, 'Sangay': 218, 'Santa_Maria': 96, 'Stromboli': 75, 'Telica': 73, 'Tinakula': 109}
+    volcano_not_events_locations_dict = {'Barren_Island': 160, 'Chillan_Nevados_de': 80, 'Copahue': 82, 'Etna': 261, 'Fuego': 193, 'Karangetang': 41, 'Krysuvik-Trolladyngja': 233, 'La_Palma': 74, 'Mayon': 74, 'Nyamulagira': 534, 'Poas': 112, 'Raung': 286, 'San_Miguel': 300, 'Sangay': 240, 'Santa_Maria': 108, 'Stromboli': 81, 'Tinakula': 122}
 
     #Events dictionaries
     ## Fire event: locations - n_events dictionary
-    fire_events_locations_dict={'Bolivia': 16, 'France': 14, 'Greece': 36, 'Italy': 9, 'Kenya': 12, 'Latvia': 2, 'Mexico': 21, 'Spain': 10, 'Sweden': 10, 'Ukraine': 12}
-
+    fire_events_locations_dict = {'Bolivia': 18, 'France': 15, 'Greece': 41, 'Italy': 10, 'Kenya': 13, 'Latvia': 3, 'Mexico': 25, 'Spain': 11, 'Sweden': 11, 'Ukraine': 14}
+    
     ## Volcanoes event: locations - n_events dictionary
-    volcano_events_locations_dict={'Barren_Island': 8, 'Chillan_Nevados_de': 4, 'Copahue': 2, 'Etna': 15, 'Fuego': 14, 'Karangetang': 1, 'Krysuvik-Trolladyngja': 14, 'La_Palma': 8, 'Mayon': 7, 'Nyamulagira': 25, 'Piton_de_la_Fournaise': 17, 'Poas': 3, 'Raung': 28, 'San_Miguel': 42, 'Sangay': 10, 'Santa_Maria': 7, 'Stromboli': 2, 'Telica': 4, 'Tinakula': 3}
-    
-    
+    volcano_events_locations_dict = {'Barren_Island': 8, 'Chillan_Nevados_de': 4, 'Copahue': 2, 'Etna': 18, 'Karangetang': 1, 'Krysuvik-Trolladyngja': 16, 'La_Palma': 9, 'Mayon': 8, 'Nyamulagira': 26, 'Raung': 29, 'San_Miguel': 48, 'Sangay': 12, 'Santa_Maria': 8, 'Stromboli': 3, 'Telica': 4, 'Tinakula': 3}
+
+
     volcanoes_events_keys_shuffled=deepcopy(list(volcano_events_locations_dict.keys()))
     fires_events_keys_shuffled=deepcopy(list(fire_events_locations_dict.keys()))
     volcanoes_not_events_keys_shuffled=deepcopy(list(volcano_not_events_locations_dict.keys()))
@@ -130,8 +129,6 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, seed=
             location=filename_dropped[:-2]
         else:
             location=filename_dropped[:-3]
-        
-        
 
         if ((location in events_locations_tests_list) and labels[n] == 0) or ((location in not_events_locations_tests_list) and (labels[n] == 1)):
             X_test[n_test_selected]=images[n]
@@ -145,10 +142,10 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, seed=
 
 from .utils import upsample_ds
 
-class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
-    """Thraws dataset"""
+class THRAWS_train_dataset(torch.utils.data.Dataset):
+    """Thraws train dataset"""
 
-    def __init__(self, train, root_dir="./DATA/warmup_events_dataset/", transform=None, seed=42, upsample_ratio=None):
+    def __init__(self, train, root_dir="./DATA/THRAWS/TrainVal", transform=None, seed=42, upsample_ratio=None):
         """
         Args:
             train (bool): If true returns training set, else test
@@ -167,7 +164,7 @@ class ThrawsB8AB11B12Dataset(torch.utils.data.Dataset):
         self.transform = transform
         self.test_ratio = 0.1
         self.train = train
-        self.N = 4528  # Modified to be inferred from data.
+        self.N = 4502  # Modified to be inferred from data.
         self.upsample_ratio = upsample_ratio
         self._load_data()
 

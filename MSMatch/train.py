@@ -13,13 +13,13 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 
 from utils import net_builder, get_logger, count_parameters, create_dir_str
-from train_utils import TBLog, get_OPT, get_cosine_schedule_with_warmup
+from train_utils import TBLog, get_OPT, get_cosine_schedule_with_warmup, mcc
 from models.fixmatch.fixmatch import FixMatch
 from datasets.ssl_dataset import SSL_Dataset
 from datasets.data_utils import get_data_loader
 
 #THRAWS_SWIR supported seeds between 0 and 50.
-THRAWS_SWIR_SUPPORTED_SEEDS=[0, 6, 8, 11, 19, 21, 25, 28, 35, 46, 47]
+THRAWS_SWIR_SUPPORTED_SEEDS=[0, 9, 14, 18, 19, 25, 28, 30, 37]
 
 def main(args):
     """
@@ -268,6 +268,36 @@ def main_worker(gpu, ngpus_per_node, args):
 
     logging.warning(f"GPU {args.rank} training is FINISHED")
 
+    if args.test_dataset is not None:
+        model_eval=model.eval_model 
+        model_eval.eval()
+        _test_dset = SSL_Dataset(
+        name=args.test_dataset, train=False, data_dir=args.data_dir, seed=args.seed,
+        )
+        test_dset = _test_dset.get_dset()
+        test_loader = get_data_loader(test_dset, args.batch_size, num_workers=1)
+
+        acc = 0.0
+        n = 0
+        logging.warning(f"--------------------TEST DATASET EVALUATION--------------------")
+        
+        with torch.no_grad():
+            for image, target in test_loader:
+                image = image.type(torch.FloatTensor).cuda()
+                logit = model_eval(image)
+                acc += logit.cpu().max(1)[1].eq(target).sum().numpy()
+                
+                if n == 0:
+                    pred=logit
+                    correct=target
+                    n+=1
+                else:
+                    pred=torch.cat((pred, logit), axis=0)
+                        
+
+                    correct=torch.cat((correct, target), axis=0)
+        logging.warning(f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}")
+            
 
 if __name__ == "__main__":
     import argparse
@@ -358,6 +388,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--data_dir", type=str, default="./data")
     parser.add_argument("--dataset", type=str, default="cifar10")
+    parser.add_argument("--test_dataset", type=str, default=None)
     parser.add_argument("--train_sampler", type=str, default="RandomSampler")
     parser.add_argument("--num_workers", type=int, default=1)
 
