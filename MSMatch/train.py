@@ -279,7 +279,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
         acc = 0.0
         n = 0
-        logging.warning(f"--------------------TEST DATASET EVALUATION--------------------")
+        logger.info(f"--------------------TEST DATASET EVALUATION--------------------")
         
         with torch.no_grad():
             for image, target in test_loader:
@@ -296,7 +296,7 @@ def main_worker(gpu, ngpus_per_node, args):
                         
 
                     correct=torch.cat((correct, target), axis=0)
-        logging.warning(f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}")
+        logger.info(f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}")
             
 
 if __name__ == "__main__":
