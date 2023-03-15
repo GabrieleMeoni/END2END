@@ -2,6 +2,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 import torch.nn.functional as F
+from fastai.metrics import MatthewsCorrCoef
 
 import math
 import time
@@ -173,6 +174,23 @@ def accuracy(output, target, topk=(1,)):
         # np.shape(res): [k, 1]
         return res
 
+def mcc(output, target):
+    """
+    Computes the Matthews Correlation Coefficient.
+
+    Args
+        output: logits or probs (num of batch, num of classes)
+        target: (num of batch, 1) or (num of batch, )
+    refer: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.matthews_corrcoef.html
+    """
+    mcc = MatthewsCorrCoef()
+    with torch.no_grad():
+        pred_c=torch.argmax(output, axis=1)
+        if len(target.shape) > 1:
+            target_c=torch.argmax(target, axis=1)
+        else:
+            target_c=target
+    return mcc(pred_c, target_c)
 
 def ce_loss(logits, targets, use_hard_labels=True, reduction="none"):
     """
@@ -190,3 +208,5 @@ def ce_loss(logits, targets, use_hard_labels=True, reduction="none"):
         log_pred = F.log_softmax(logits, dim=-1)
         nll_loss = torch.sum(-targets * log_pred, dim=1)
         return nll_loss
+    
+
