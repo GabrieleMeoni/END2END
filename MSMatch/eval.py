@@ -10,6 +10,8 @@ from sklearn.metrics import confusion_matrix
 from utils import get_classes_name
 from train_utils import mcc
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     import argparse
@@ -20,6 +22,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--use_train_model", action="store_true")
     parser.add_argument("--export_confusion_matrix", action="store_true")
+    parser.add_argument("--plot_confusion_matrix", action="store_true")
     parser.add_argument("--csv_path", type=str, default=".")
 
     """
@@ -106,7 +109,6 @@ if __name__ == "__main__":
         print("\nExtracting the confusion matrix...")
         
         class_names=sorted(get_classes_name(_eval_dset))
-        print("CLASS NAMESSSS:", class_names)
         c_m = confusion_matrix(y_true, y_pred)
         
         c_m_names=pd.DataFrame(c_m, columns=class_names,index=class_names)
@@ -120,9 +122,22 @@ if __name__ == "__main__":
         classification_data={"y_true" : class_expected_list, "Y_pred" : class_predicted_list}
         class_df=pd.DataFrame(classification_data)
         
+
         if args.load_path[-1] == os.path.sep:
             args.load_path=args.load_path[:-1]
             
         csv_name=args.load_path.split(os.path.sep)[-2]
+
+        if args.plot_confusion_matrix:
+            plt.figure(figsize=(8,8), dpi=100)
+            # Scale up the size of all text
+            sns.set(font_scale = 1.1)
+            ax = sns.heatmap(c_m, annot=True, fmt='d', )
+            ax.set_xlabel("Predicted", fontsize=14, labelpad=20)
+            ax.xaxis.set_ticklabels(class_names)
+            ax.set_ylabel("Actual", fontsize=14, labelpad=20)
+            ax.yaxis.set_ticklabels(class_names)
+            plt.savefig(os.path.join(args.csv_path, csv_name+"_conf_matrix.png"))
+            
         c_m_names.to_csv(os.path.join(args.csv_path, csv_name+"_conf_matrix.csv"))
         class_df.to_csv(os.path.join(args.csv_path, csv_name+"_detailed_results.csv"))

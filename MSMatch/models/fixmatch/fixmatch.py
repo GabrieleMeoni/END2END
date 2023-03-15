@@ -319,8 +319,8 @@ class FixMatch:
                 correct=y
                 n+=1
             else:
-                pred=torch.stack((pred, logits), axis=1)
-                correct=torch.stack((correct, y), axis=1)
+                pred=torch.cat((pred, logits), axis=0)
+                correct=torch.cat((correct, y), axis=0)
                 
         if not use_ema:
             eval_model.train()

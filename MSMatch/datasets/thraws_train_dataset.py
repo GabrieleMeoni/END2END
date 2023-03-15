@@ -145,11 +145,12 @@ from .utils import upsample_ds
 class THRAWS_train_dataset(torch.utils.data.Dataset):
     """Thraws train dataset"""
 
-    def __init__(self, train, root_dir="./DATA/THRAWS/TrainVal", transform=None, seed=42, upsample_ratio=None):
+    def __init__(self, train, root_dir="./DATA/THRAWS/TrainVal", eval_split_ratio=0.3,transform=None, seed=42, upsample_ratio=None):
         """
         Args:
             train (bool): If true returns training set, else test
             root_dir (string): Directory with all the images.
+            test_ratio (float): test_ratio. Defualts to 0.3.
             transform (callable, optional): Optional transform to be applied
                 on a sample.
             seed (int): seed used for train/test split
@@ -162,7 +163,7 @@ class THRAWS_train_dataset(torch.utils.data.Dataset):
         self.num_classes = 2
         self.root_dir = root_dir
         self.transform = transform
-        self.test_ratio = 0.1
+        self.test_ratio = eval_split_ratio
         self.train = train
         self.N = 4502  # Modified to be inferred from data.
         self.upsample_ratio = upsample_ratio

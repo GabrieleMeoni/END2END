@@ -19,7 +19,8 @@ from datasets.ssl_dataset import SSL_Dataset
 from datasets.data_utils import get_data_loader
 
 #THRAWS_SWIR supported seeds between 0 and 50.
-THRAWS_SWIR_SUPPORTED_SEEDS=[0, 9, 14, 18, 19, 25, 28, 30, 37]
+THRAWS_SWIR_SUPPORTED_SEEDS={0.1 : [0, 9, 14, 18, 19, 25, 28, 30, 37], 0.15 : [2, 3, 11, 12, 21, 26, 31, 33, 35, 47], 0.20 : [2, 4, 6, 23, 31, 33, 34, 42, 47, 48, 49], 0.25 : [0, 1, 4, 16, 30, 48], 0.30 : [2, 5, 8, 9, 15, 16, 19, 32, 33, 37, 38, 42, 45]}
+
 
 def main(args):
     """
@@ -91,8 +92,8 @@ def main_worker(gpu, ngpus_per_node, args):
     assert args.seed is not None
 
     #Checking supported seed 
-    if args.dataset == "thraws_swir"  and not(args.seed in THRAWS_SWIR_SUPPORTED_SEEDS):
-        raise ValueError("The seed: "+args.seed+" is not supported when dataset thraws_swir is used. \nList of supported seed:", THRAWS_SWIR_SUPPORTED_SEEDS)
+    if args.dataset == "thraws_swir_train"  and not(args.seed in THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio]):
+        raise ValueError("The seed: "+str(args.seed)+" is not supported when dataset thraws_swir is used. \nList of supported seed:", THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio])
     
     random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -127,7 +128,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # Construct Dataset
     train_dset = SSL_Dataset(
-        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
+        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio,upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
     )
     lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
 
@@ -135,7 +136,7 @@ def main_worker(gpu, ngpus_per_node, args):
     args.num_channels = train_dset.num_channels
 
     _eval_dset = SSL_Dataset(
-        name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
+        name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
     )
     eval_dset = _eval_dset.get_dset()
 
@@ -317,6 +318,7 @@ if __name__ == "__main__":
     parser.add_argument("--train_upsample_notevent", type=int, default=1)
     parser.add_argument("--eval_upsample_event", type=int, default=1)
     parser.add_argument("--eval_upsample_notevent", type=int, default=1)
+    parser.add_argument("--eval_split_ratio", type=float, default=0.3)
 
     """
     Training Configuration of FixMatch
