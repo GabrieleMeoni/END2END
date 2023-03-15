@@ -106,7 +106,7 @@ class SSL_Dataset:
     and return BasicDataset: torch.utils.data.Dataset (see datasets.dataset.py)
     """
 
-    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42, upsample_event=7, upsample_notevent=1):
+    def __init__(self, name="cifar10", train=True, data_dir=None, seed=42, upsample_event=7, upsample_notevent=1):
         """
         Args
             name: name of dataset in torchvision.datasets (cifar10, cifar100)
@@ -119,7 +119,8 @@ class SSL_Dataset:
         self.name = name
         self.seed = seed
         self.train = train
-        self.data_dir = data_dir
+        self.data_dir=data_dir
+
         self.transform = get_transform(mean[name], std[name], train)
         self.inv_transform = get_inverse_transform(mean[name], std[name])
         self.upsample_event = upsample_event
@@ -164,6 +165,9 @@ class SSL_Dataset:
             self.label_encoding = dset.label_encoding
             self.num_classes = dset.num_classes
             self.num_channels = dset.num_channels
+
+        if self.data_dir is None:
+            self.data_dir = dset.root_dir
 
         data, targets = dset.data, dset.targets
         return data, targets
