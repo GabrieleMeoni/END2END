@@ -14,7 +14,7 @@ import seaborn as sn
 import matplotlib.pyplot as plt
 
 
-def get_classes_name(ssl_dataset, keep_unlabeled_class=False):
+def get_classes_name(ssl_dataset):
     """
     Get class names.
     """
