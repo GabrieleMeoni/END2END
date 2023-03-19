@@ -149,9 +149,9 @@ class SSL_Dataset:
         elif self.name == "eurosat_ms":
             dset = EurosatDataset(train=self.train, seed=self.seed)
         elif self.name == "thraws_swir_train":
-            dset = THRAWS_train_dataset(train=self.train, seed=self.seed, eval_split_ratio=self.eval_split_ratio, upsample_ratio=[self.upsample_notevent, self.upsample_event])
+            dset = THRAWS_train_dataset(train=self.train, root_dir=self.data_dir, seed=self.seed, eval_split_ratio=self.eval_split_ratio, upsample_ratio=[self.upsample_notevent, self.upsample_event])
         elif self.name == "thraws_swir_test":
-            dset = THRAWS_test_dataset()
+            dset = THRAWS_test_dataset(root_dir=self.data_dir)
         
 
         if self.name == "cifar10":
@@ -171,6 +171,7 @@ class SSL_Dataset:
             self.data_dir = dset.root_dir
 
         data, targets = dset.data, dset.targets
+        self.size=dset.size
         return data, targets
 
     def get_dset(self, use_strong_transform=False, strong_transform=None, onehot=False):
@@ -223,6 +224,7 @@ class SSL_Dataset:
         """
 
         data, targets = self.get_data()
+        
         num_classes = self.num_classes
         transform = self.transform
 

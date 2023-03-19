@@ -6,8 +6,9 @@ channels:
 dependencies:
 - python=3.8
 - pytorch=1.7.0
+- nncf
+- termcolor
 - torchvision=0.8.0
-- torchaudio=0.7.0
 - cudatoolkit=10.1
 - tensorboard=2.3.0
 - pillow
@@ -27,3 +28,4 @@ dependencies:
 - pip:
   - efficientnet_lite_pytorch
   - efficientnet_lite0_pytorch_model
+  - openvino
