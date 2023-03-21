@@ -4,12 +4,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import BatchSampler
 
-from .data_utils import get_sampler_by_name, get_data_loader, get_onehot, split_ssl_data
+from .data_utils import  split_ssl_data
 from .dataset import BasicDataset
-from .ucm_dataset import UCMDataset
-from .aid_dataset import AIDDataset
-from .eurosat_rgb_dataset import EurosatRGBDataset
-from .eurosat_dataset import EurosatDataset
 from .thraws_train_dataset import THRAWS_train_dataset
 from .thraws_test_dataset import THRAWS_test_dataset
 
@@ -50,27 +46,6 @@ std['thraws_swir_test']=[1,1,1] # 8 bit sampling
 
 std["cifar10"] = [x / 255 for x in [63.0, 62.1, 66.7]]
 std["cifar100"] = [x / 255 for x in [68.2, 65.4, 70.4]]
-std["ucm"] = [x / 255 for x in [55.40512165, 51.34108472, 49.80905244]]
-std["aid"] = [x / 255 for x in [53.71052739, 47.81369006, 47.19406823]]
-std["eurosat_rgb"] = [x / 255 for x in [51.92045453, 34.82338243, 29.26981551]]
-std["eurosat_ms"] = [
-    x / 255
-    for x in [
-        52.42854549,
-        41.13263869,
-        35.29470731,
-        35.12547202,
-        32.75119418,
-        39.77189372,
-        50.80983189,
-        53.91031257,
-        21.51845906,
-        0.54159901,
-        56.63841871,
-        42.25028442,
-        60.01180004,
-    ]
-]
 
 
 def get_transform(mean, std, train=True):
@@ -140,14 +115,6 @@ class SSL_Dataset:
         if self.name in ["cifar10", "cifar100"]:
             dset = getattr(torchvision.datasets, self.name.upper())
             dset = dset(self.data_dir, train=self.train, download=True)
-        elif self.name == "ucm":
-            dset = UCMDataset(train=self.train, seed=self.seed)
-        elif self.name == "aid":
-            dset = AIDDataset(train=self.train, seed=self.seed)
-        elif self.name == "eurosat_rgb":
-            dset = EurosatRGBDataset(train=self.train, seed=self.seed)
-        elif self.name == "eurosat_ms":
-            dset = EurosatDataset(train=self.train, seed=self.seed)
         elif self.name == "thraws_swir_train":
             dset = THRAWS_train_dataset(train=self.train, root_dir=self.data_dir, seed=self.seed, eval_split_ratio=self.eval_split_ratio, upsample_ratio=[self.upsample_notevent, self.upsample_event])
         elif self.name == "thraws_swir_test":

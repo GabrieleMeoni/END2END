@@ -39,12 +39,21 @@ To activate your environment, please execute:
 
 ### Set-up for the embedded hardware implementation
 We have implemented a prototype on the [Intel Neural Compute Stick 2 (NCS2)](https://www.intel.com/content/www/us/en/developer/articles/tool/neural-compute-stick.html). <br>
-If you also want to use the files in the `nc2` directory, you also need to quantize your model to infer your model on the NCS2.
-To this aim, you can use the script `quantize.py` located in `ncs2\quantization`, which implements `INT8` quantization. 
-If you use "Windows", proceed as follows: 
+If you also want to use the files in the `nc2` directory, you need to install [OPENVINOv 2022.1](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/download.html). Please proceed as follow (tested for Windows): 
 
- *  install the `Build Tools for Visual Studio 2022`, including `Desktop development with C++` from [Visual Studio 2022](https://visualstudio.microsoft.com/it/downloads/). Theoretically, the use of other compilers should be possible, despite we did not manage to make it run without it. 
- * When you launch `quantize.py`, please, make use to specify the path including the "cl.exe" file through the flag "--cl_exe_path" (i.e., ```python quantize.py --cl_exe_path path_to_dir_including_cl_exe other flags```).
+1. Select version 2022.1 and download the offline installer.
+2. Install openvino through the downloaded offline installer. By default, it should produce the a directoru called "Intel".
+3. Install openvino in the `end2end` conda environment through: 
+
+```pip install openvino==2022.1````
+4. Install numpy==1.23.4 in the conda environment. 
+5. Copy the content of `Intel\openvino_2022.1.0.643\runtime\bin\intel64\Release` into your 
+   `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs`
+
+6. Export `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs` to PATH 
+
+Now, you should be able to work with the NCS2 device. 
+
 
 ## Contributing
 The ```end2end``` project is open to contributions. To discuss new ideas and applications, please, reach us via email (please, refer to [Contact](#contact)). To report a bug or request a new feature, please, open an [issue](https://github.com/GabrieleMeoni/END2END/issues) to report a bug or to request a new feature. 

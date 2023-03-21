@@ -4,13 +4,12 @@ channels:
 - pytorch
 - fastchan
 dependencies:
-- python=3.8
-- pytorch=1.7.0
-- nncf
+- python=3.8.10
+- pytorch=1.12.1
 - termcolor
-- torchvision=0.8.0
-- cudatoolkit=10.1
-- tensorboard=2.3.0
+- torchvision=0.13.1
+- cudatoolkit=11.6
+- tensorboard
 - pillow
 - tqdm
 - scikit-image
@@ -19,13 +18,12 @@ dependencies:
 - efficientnet-pytorch
 - pandas
 - seaborn
-- albumentations=0.5.2
+- albumentations
 - scipy
-- numpy=1.23.4
+- numpy
 - imgaug
 - nb_conda_kernels
 - fastai
 - pip:
   - efficientnet_lite_pytorch
   - efficientnet_lite0_pytorch_model
-  - openvino

@@ -1,7 +1,7 @@
 from torchvision import datasets, transforms
 from torch.utils.data import Dataset
 from .data_utils import get_onehot
-from .augmentation.randaugment import RandAugment
+
 
 from PIL import Image
 import numpy as np
@@ -52,6 +52,7 @@ class BasicDataset(Dataset):
 
         self.transform = transform
         if use_strong_transform:
+            from .augmentation.randaugment import RandAugment
             if strong_transform is None:
                 self.strong_transform = copy.deepcopy(transform)
                 self.strong_transform.transforms.insert(
