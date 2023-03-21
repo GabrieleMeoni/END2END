@@ -13,6 +13,20 @@ import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
 
+
+def get_classes_name(ssl_dataset, keep_unlabeled_class=False):
+    """
+    Get class names.
+    """
+    classes_names=sorted(glob.glob(os.path.join(ssl_dataset.data_dir,"*")))
+
+    class_dir=[]
+    for c_name in classes_names:
+        class_dir.append(c_name.split(os.path.sep)[-1])
+   
+    return class_dir
+
+
 def plot_cmatrix(preds,labels,encoding, figsize=(8, 5),dpi=150, class_names_font_scale=1.2, matrix_font_size=12, save_fig_name=None):
     """Plotting the confusion matrix for one or three dataset seeds. 
 

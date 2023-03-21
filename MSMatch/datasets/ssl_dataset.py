@@ -106,25 +106,27 @@ class SSL_Dataset:
     and return BasicDataset: torch.utils.data.Dataset (see datasets.dataset.py)
     """
 
-    def __init__(self, name="cifar10", train=True, data_dir="./data", seed=42, upsample_event=7, upsample_notevent=1):
+    def __init__(self, name="cifar10", train=True, data_dir=None, seed=42, eval_split_ratio=0.3, upsample_event=7, upsample_notevent=1):
         """
         Args
             name: name of dataset in torchvision.datasets (cifar10, cifar100)
             train: True means the dataset is training dataset (default=True)
             data_dir: path of directory, where data is downloaed or stored.
             seed: seed to use for the train / test split. Not available for cifar which is presplit
+            eval_split_ratio: percentage of the eval split over the entire dataset.
             upsample_ratio: ratio of notevent, event upsampling
         """
 
         self.name = name
         self.seed = seed
         self.train = train
-        self.data_dir = data_dir
+        self.data_dir=data_dir
+
         self.transform = get_transform(mean[name], std[name], train)
         self.inv_transform = get_inverse_transform(mean[name], std[name])
         self.upsample_event = upsample_event
         self.upsample_notevent = upsample_notevent
-
+        self.eval_split_ratio = eval_split_ratio
         self.use_ms_augmentations = False
         # need to use different augmentations for multispectral
         if self.name == "eurosat_ms":
@@ -147,7 +149,7 @@ class SSL_Dataset:
         elif self.name == "eurosat_ms":
             dset = EurosatDataset(train=self.train, seed=self.seed)
         elif self.name == "thraws_swir_train":
-            dset = THRAWS_train_dataset(train=self.train, seed=self.seed, upsample_ratio=[self.upsample_notevent, self.upsample_event])
+            dset = THRAWS_train_dataset(train=self.train, seed=self.seed, eval_split_ratio=self.eval_split_ratio, upsample_ratio=[self.upsample_notevent, self.upsample_event])
         elif self.name == "thraws_swir_test":
             dset = THRAWS_test_dataset()
         
@@ -164,6 +166,9 @@ class SSL_Dataset:
             self.label_encoding = dset.label_encoding
             self.num_classes = dset.num_classes
             self.num_channels = dset.num_channels
+
+        if self.data_dir is None:
+            self.data_dir = dset.root_dir
 
         data, targets = dset.data, dset.targets
         return data, targets
