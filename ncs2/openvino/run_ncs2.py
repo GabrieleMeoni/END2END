@@ -67,15 +67,16 @@ def main():
         predicted.append(compiled_model([X])[output_layer])
         targets.append(y)
     stop_time = time.time()
-
-    
+    print(colored("Testing finished.", "green"))
+    print(colored("Calculating results...", "blue"))
         
-    inference_time = (stop_time - start_time)/len(test_loader)
+    inference_time = (stop_time - start_time)
 
     accuracy, mcc_results = get_performance(targets, predicted)
 
-
-    print("inference time[s]: "+colored(str(inference_time), "blue"))
+    print("Total inference time[s]: "+colored(str(inference_time), "blue"))
+    print("Number of patches: "+colored(str(len(test_loader)), "yellow"))
+    print("Average inference time per patch[s]: "+colored(str(inference_time/len(test_loader)), "cyan"))
     print("Accuracy [%]: "+colored(str(accuracy * 100), "green"))
     print("MCC: "+colored(str(mcc_results), "red"))
 
