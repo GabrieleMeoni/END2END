@@ -1,7 +1,22 @@
 # END2END
-End2end training on S2 raw data
-## About the project 
-This project investigates the training on Sentinel-2 RAW data. 
+### END2END: End2end training on S2 raw data
+# About the project 
+
+## 🛰️ END2END: Onboard Detection of Thermal Anomalies from Raw Sentinel-2 Data
+
+END2END is a library for onboard detection of thermal anomalies from raw Sentinel-2 data. The code base for this library is derived from the paper "MSMatch: Semi-Supervised Multispectral Scene Classification with Few Labels" (arXiv:2103.10368) by Pablo Gómez and Gabriele Meoni.
+
+## 🌍🧑‍🔬 The Challenge of Supervised Learning in Remote Sensing
+
+Supervised learning techniques are at the center of many tasks in remote sensing. However, these methods often require large amounts of labeled data for training. Labeling data can be tedious, expensive, and requires expert knowledge. END2END provides a solution to this problem by using semi-supervised learning techniques.
+
+## 📈💻 MSMatch: Semi-Supervised Learning for Scene Classification
+
+The MSMatch algorithm, which is implemented in END2END, is the first semi-supervised learning approach that is competitive with supervised methods on scene classification on the EuroSAT and UC Merced Land Use benchmark datasets. With just five labeled examples per class, the neural network can achieve up to 95.86% accuracy on the EuroSAT multispectral dataset, outperforming previous methods by up to 19.76%. On the UC Merced Land Use dataset, END2END outperforms previous works by up to 5.59% and reaches 90.71% accuracy with just five labeled examples.
+
+## 🚀👨‍🚀 Easy Reproduction and Quick Adoption
+
+END2END provides the source code of MSMatch online to enable easy reproduction and quick adoption. It hendles well to multispectral raw data and should enable various applications that are currently infeasible.
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
