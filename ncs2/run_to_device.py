@@ -31,6 +31,7 @@ def main():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("--load_path", type=str, default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\openvino\output\efficientnet-lite0.xml")
     parser.add_argument("--test_dataset", type=str, default="thraws_swir_test")
+    parser.add_argument("--device", type=str, default="MYRIAD", help="Embedded device. Supported ""CPU"", ""GPU"", ""MYRIAD"".")
     args = parser.parse_args()
 
     # Create SSL loaders
@@ -48,14 +49,12 @@ def main():
     model = ie_core.read_model(model=args.load_path)
     # Compile the model for CPU (you can choose manually CPU, GPU, MYRIAD etc.)
     # or let the engine choose the best available device (AUTO).
-    compiled_model = ie_core.compile_model(model=model, device_name="MYRIAD")
+    compiled_model = ie_core.compile_model(model=model, device_name=args.device)
 
     # Get the input and output nodes.
     input_layer = compiled_model.input(0)
     output_layer = compiled_model.output(0)
 
-    # Get the input size.
-    height, width = list(input_layer.shape)[1:3]
 
     predicted=[]
     targets=[]

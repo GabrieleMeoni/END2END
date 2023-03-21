@@ -56,7 +56,11 @@ If you also want to use the files in the `ncs2` directory, you need to install [
 
 Now, you should be able to work with the NCS2 device. 
 
-## Workflow 
+## Workflow to implement a trained model on the edge device 
+Once you have trained your model by using [MSMAtch](https://github.com/gomezzz/MSMatch), you can implement the trained model on the edge dvice as follows: 
+<p align="center">
+  <img src="resources/images/ncs2WorkFlow.drawio.png" alt="Sublime's custom image"/>
+</p>
 
 
 ## Contributing

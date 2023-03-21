@@ -1,6 +1,9 @@
 *.zip
 *.pyc
 *.pkl
+*.bin
+*.xml
+*.onnx
 *.pth
 *.txt
 MSMatch/*.csv
