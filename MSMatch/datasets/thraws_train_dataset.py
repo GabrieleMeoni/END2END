@@ -161,7 +161,11 @@ class THRAWS_train_dataset(torch.utils.data.Dataset):
         self.size = [256, 256]
         self.num_channels = 3
         self.num_classes = 2
-        self.root_dir = root_dir
+        if root_dir is not None:
+            self.root_dir = os.path.join(root_dir, "THRAWS", "TrainVal")
+        else:
+            self.root_dir = "./DATA/THRAWS/TrainVal"
+
         self.transform = transform
         self.test_ratio = eval_split_ratio
         self.train = train

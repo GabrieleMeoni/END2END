@@ -15,6 +15,7 @@ CONFUSION_MATRIX="--export_confusion_matrix --csv_path $CSV_PATH --plot_confusio
 
 LOAD_PATH="/data/PyDeepLearning/END2END/MSMatch/checkpoints/iter2/thraws_swir_train/FixMatch_archefficientnet-lite0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels600_optSGD/model_best.pth"
 
+
 #switch to fixmatch folder for execution
 cd $FIXMATCH_FOLDER
 echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
