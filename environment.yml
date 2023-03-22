@@ -15,6 +15,7 @@ dependencies:
 - scikit-image
 - scikit-learn
 - imageio
+- rasterio
 - efficientnet-pytorch
 - pandas
 - seaborn

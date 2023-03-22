@@ -35,7 +35,7 @@ def main():
     args = parser.parse_args()
 
     # Create SSL loaders
-    data_dir=os.path.join(os.getcwd(), "..","..", "MSMatch", "DATA")
+    data_dir=os.path.join(os.getcwd(), "..", "MSMatch", "DATA")
     print("Import "+colored("test", "green")+" dataset: "+colored(args.test_dataset,"blue"))
     _test_dset = SSL_Dataset(name=args.test_dataset, data_dir=data_dir)
     test_dset = _test_dset.get_dset()
