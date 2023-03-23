@@ -51,6 +51,7 @@ class BasicDataset(Dataset):
         self.onehot = onehot
 
         self.transform = transform
+ 
         if use_strong_transform:
             from .augmentation.randaugment import RandAugment
             if strong_transform is None:
@@ -81,13 +82,17 @@ class BasicDataset(Dataset):
         # set augmented images
 
         img = self.data[idx]
+        
         if self.transform is None:
-            print('PUCCIOSTERZA')
             return transforms.ToTensor()(img), target
         else:
             if isinstance(img, np.ndarray) and not self.use_ms_augmentations:
                 img = Image.fromarray(img)
+
             img_w = self.transform(img)
+            print(self.transform)
+            print(img_w)
+            
             if not self.use_strong_transform:
                 return img_w, target
             else:

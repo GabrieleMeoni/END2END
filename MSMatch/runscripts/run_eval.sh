@@ -19,6 +19,5 @@ LOAD_PATH=r"C:\Users\meoni\Documents\ESA\Projects\END2END\MSMatch\checkpoint\thr
 cd $FIXMATCH_FOLDER
 echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 
-
 #Remove "echo" to launch the script.
 python eval.py --load_path $LOAD_PATH --net $NET --batch_size $BATCH_SIZE --dataset $DATASET --seed $SEED $CONFUSION_MATRIX 

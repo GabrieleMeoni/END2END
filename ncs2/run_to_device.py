@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.insert(1, os.path.join("..", "..", "MSMatch"))
+sys.path.insert(1, os.path.join("..", "MSMatch"))
 import time
 import torch
 import argparse
@@ -29,7 +29,7 @@ def get_performance(targets, preds):
 def main():
     
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--load_path", type=str, default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\openvino\output\efficientnet-lite0.xml")
+    parser.add_argument("--load_path", type=str, default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\output\efficientnet-lite0.xml")
     parser.add_argument("--test_dataset", type=str, default="thraws_swir_test")
     parser.add_argument("--device", type=str, default="MYRIAD", help="Embedded device. Supported ""CPU"", ""GPU"", ""MYRIAD"".")
     args = parser.parse_args()

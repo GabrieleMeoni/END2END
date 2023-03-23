@@ -297,7 +297,7 @@ def main_worker(gpu, ngpus_per_node, args):
                         
 
                     correct=torch.cat((correct, target), axis=0)
-        logger.info(f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}")
+        logger.info(f"Test accuracy: {acc / len(test_dset)} Test mcc: {mcc(pred, correct)}")
             
 
 if __name__ == "__main__":

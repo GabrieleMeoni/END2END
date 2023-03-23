@@ -54,7 +54,16 @@ If you also want to use the files in the `ncs2` directory, you need to install [
 
 6. Export `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs` to PATH 
 
+7. It is necessary to install `openvino-dev` that is necessary to export models to openvino IR format. To this aim, we use python virtual env to avoid conflicts. Please, proceed as follows:
+
+* Navigate to the `ncs2` directory.
+* Crete a virtual environment called `openvino_env` through: ```python -m env openvino_env```
+* Activate the virtual environment through: ```openvino_env\Scripts\activate```
+* Install `openvino-dev` through: ```pip install openvino-dev```
+
 Now, you should be able to work with the NCS2 device. 
+
+Everytime you need to use ```export_to_openvino.py```, remember to activate the virtual environment.
 
 ## Workflow to implement a trained model on the edge device 
 Once you have trained your model by using [MSMAtch](https://github.com/gomezzz/MSMatch), you can implement the trained model on the edge dvice as follows: 

@@ -1,8 +1,13 @@
 import os
+os.environ["PATH"]=os.path.join(os.getcwd(), "openvino_evn", "Lib", "site-packages", "openvino", "libs;")+os.environ["PATH"]
+path=os.path.join(os.getcwd(), "openvino_evn", "Lib", "site-packages", "openvino", "libs;")
+print(path)
+
 import sys
 sys.path.insert(1, os.path.join("..", "..", "MSMatch"))
 import argparse
 from pathlib import Path
+
 
 def main():
     
