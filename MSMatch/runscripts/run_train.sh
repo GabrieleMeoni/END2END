@@ -1,16 +1,16 @@
 #!/bin/bash
 export CUDA_VISIBLE_DEVICES=0
 DEVICE=0
-FIXMATCH_FOLDER="/data/PyDeepLearning/END2END/MSMatch/"
-SAVE_LOCATION="/data/PyDeepLearning/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_NAME="iter2"                             
+FIXMATCH_FOLDER="/home/roberto/PythonProjects/END2END/MSMatch/"
+SAVE_LOCATION="/home/roberto/PythonProjects/END2END/MSMatch/checkpoints/" # Where tensorboard output will be written
+SAVE_NAME="Ups_2_2"                             
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
 NET=efficientnet-lite0 #Options are wideResNet,efficientnet-lite0, efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
 UNLABELED_RATIO=4
 BATCH_SIZE=8
 EVAL_SPLIT_RATIO=0.3 #Evaluation split percentage over the whole train/eval dataset.
-N_EPOCH=150                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
+N_EPOCH=50                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000            #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
 SEED=2
@@ -24,9 +24,9 @@ USE_MCC_FOR_BEST="--use_mcc_for_best" # Leave empty to select best model dependi
 mkdir -p $SAVE_LOCATION
 
 #Upsampling values.
-TRAIN_UPS_EVENT=5
+TRAIN_UPS_EVENT=2
 TRAIN_UPS_NOTEVENT=1
-EVAL_UPS_EVENT=1
+EVAL_UPS_EVENT=2
 EVAL_UPS_NOTEVENT=1
 EVAL_BATCH_SIZE=64
 
@@ -43,11 +43,13 @@ then
 		#Remove "echo" to launch the script.
 		python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE
 		wait
+		cd /home/roberto/PythonProjects/END2END/MSMatch
 	done
 else
 	for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 		#Remove "echo" to launch the script.
 		python train.py --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE
 		wait
+		cd /home/roberto/PythonProjects/END2END/MSMatch
 	done
 fi
