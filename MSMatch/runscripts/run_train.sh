@@ -3,7 +3,7 @@ export CUDA_VISIBLE_DEVICES=0
 DEVICE=0
 FIXMATCH_FOLDER="/home/roberto/PythonProjects/END2END/MSMatch/"
 SAVE_LOCATION="/home/roberto/PythonProjects/END2END/MSMatch/checkpoints/" # Where tensorboard output will be written
-SAVE_NAME="Ups_2_2"                             
+SAVE_NAME="Ups_3_3"                             
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
 NET=efficientnet-lite0 #Options are wideResNet,efficientnet-lite0, efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
@@ -24,9 +24,9 @@ USE_MCC_FOR_BEST="--use_mcc_for_best" # Leave empty to select best model dependi
 mkdir -p $SAVE_LOCATION
 
 #Upsampling values.
-TRAIN_UPS_EVENT=2
+TRAIN_UPS_EVENT=3
 TRAIN_UPS_NOTEVENT=1
-EVAL_UPS_EVENT=2
+EVAL_UPS_EVENT=3
 EVAL_UPS_NOTEVENT=1
 EVAL_BATCH_SIZE=64
 
