@@ -3,8 +3,7 @@ os.environ["PATH"]=os.path.join(os.getcwd(), "openvino_evn", "Lib", "site-packag
 path=os.path.join(os.getcwd(), "openvino_evn", "Lib", "site-packages", "openvino", "libs;")
 print(path)
 
-import sys
-sys.path.insert(1, os.path.join("..", "..", "MSMatch"))
+
 import argparse
 from pathlib import Path
 
@@ -12,8 +11,7 @@ from pathlib import Path
 def main():
     
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--onnx_path", type=str, default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\openvino\output\efficientnet-lite0.onnx")
-    parser.add_argument("--output_dir", type=str, default="output")
+    parser.add_argument("--onnx_path", type=str, default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\output\efficientnet-lite0.onnx")
 
     args = parser.parse_args()
 

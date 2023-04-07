@@ -52,8 +52,13 @@ def main():
 
     ### EMBEDDED DEVICE ARGUMENTS
     parser.add_argument("--device", type=str, default="MYRIAD", help="Embedded device. Supported ""CPU"", ""GPU"", ""MYRIAD"".")
-
+    parser.add_argument("--onboard_processor_device", type=str, default="CPU", help="Onboard processor device. Supported ""CPU"", ""GPU"".")
     args = parser.parse_args()
+
+    if torch.cuda.is_available() and args.onboard_processor_device == "GPU":
+        onboard_processor_device=torch.device("cuda")
+    else:
+        onboard_processor_device=torch.device("cpu")
 
     ## Loading data
     data_loaded=load_data(args.dataset_path)
@@ -75,7 +80,7 @@ def main():
 
 
     # Load onboard processor detector 
-    onboard_processor=oboardDetectorProcessor(event[0], args.detector_number, model_name=None)
+    onboard_processor=oboardDetectorProcessor(event[0], args.detector_number, model_name=None, device=onboard_processor_device)
 
     # IR path
     ir_path=args.ir_path
@@ -95,11 +100,21 @@ def main():
     print(colored("Start testing...", "red"))
     
     # Results
+    patch_time_s=0
+    inference_time_s=0
+    data_move_s=0
+    coregistration_time_s=0
     start_time = time.time()
     masks_list=[]
     x_coreg_list=[]
+    
     for granule_number in granules_numbers_list:
-        granule_coreg=onboard_processor.coarse_coregistration(granules_dict[granule_number]/255)
+        start_granule_s=time.time()
+        granule=granules_dict[granule_number].to(onboard_processor_device)
+        start_coregistration_s=time.time()
+        data_move_s +=  start_coregistration_s - start_granule_s
+        granule_coreg=onboard_processor.coarse_coregistration(granule/255)
+        coregistration_time_s += time.time() - start_coregistration_s
         onboard_processor.init_patch_engine(granule_coreg)
         # Size of the output mask
         n_v_max, n_h_max=onboard_processor.get_output_shape()
@@ -108,8 +123,12 @@ def main():
         n_v,n_h=0,0
 
         while not(onboard_processor.processing_finished()):
-            granule_patch=onboard_processor.get_next_patch()
+            patch_time_start_s=time.time()
+            granule_patch=onboard_processor.get_next_patch().to(torch.device("cpu"))
+            timestamp_s=time.time()
+            patch_time_s+=( timestamp_s- patch_time_start_s)
             y_demosaicked[n_v, n_h]= compiled_model([granule_patch.unsqueeze(0)])[output_layer].argmax()
+            inference_time_s+= (time.time() - timestamp_s)
             if n_v < n_v_max - 1:
                 n_v +=1
             else: 
@@ -118,18 +137,22 @@ def main():
     
         
         masks_list.append(y_demosaicked)
-        x_coreg_list.append(granule_coreg)
+        x_coreg_list.append(granule_coreg.to(torch.device("cpu")))
     
     stop_time = time.time()
     N_processed=len(granules_numbers_list)
-    inference_time_s = (stop_time - start_time)
+    processing_time_s = (stop_time - start_time)
 
     print(colored("Testing finished.", "green"))
     print(colored("Calculating results...", "blue"))
 
-    print("Total inference time[s]: "+colored(str(inference_time_s), "blue"))
+    print("Total inference time[s]: "+colored(str(processing_time_s), "blue"))
     print("Number of granules: "+colored(str(N_processed), "yellow"))
-    print("Average inference time per granule[s]: "+colored(str(inference_time_s/N_processed), "cyan"))
+    print("Average total time to move data per granule[s]: "+colored(str(data_move_s/N_processed), "cyan"))
+    print("Average total patch time per granule[s]: "+colored(str(patch_time_s/N_processed), "red"))
+    print("Average total coregistration time per granule[s]: "+colored(str(coregistration_time_s/N_processed), "blue"))
+    print("Average inference time per granule[s]: "+colored(str(inference_time_s/N_processed), "green"))
+    print("Average total processing time per granule[s]: "+colored(str(processing_time_s/N_processed), "cyan"))
 
     plot_results(x_coreg_list, masks_list, args.event_name+"_"+str(args.detector_number)+"_mask.png")
 

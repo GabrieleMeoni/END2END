@@ -90,9 +90,6 @@ class BasicDataset(Dataset):
                 img = Image.fromarray(img)
 
             img_w = self.transform(img)
-            print(self.transform)
-            print(img_w)
-            
             if not self.use_strong_transform:
                 return img_w, target
             else:

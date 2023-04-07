@@ -16,7 +16,7 @@ from torch.nn.functional import pad
 #
 
 class oboardDetectorProcessor():
-    def __init__(self,  satellite, detector_number, model_name="efficientnet-lite0", num_classes=2, in_channels=3, depth=28, widen_factor=2, leaky_slope=0.1, dropout=0.0, patch_overlap=0):
+    def __init__(self,  satellite, detector_number, model_name="efficientnet-lite0", num_classes=2, in_channels=3, depth=28, widen_factor=2, leaky_slope=0.1, dropout=0.0, patch_overlap=0, device=torch.device("cpu")):
         self.satellite=satellite
         self.detector_number=detector_number
 
@@ -33,6 +33,7 @@ class oboardDetectorProcessor():
             )
 
             self.ai_model= _net_builder(num_classes=num_classes, in_channels=in_channels)
+            self.ai_model.to(device)
         else:
             self.ai_model=None
         self.x_prev=None
@@ -41,6 +42,7 @@ class oboardDetectorProcessor():
         self.h=0
         self.v=0
         self.finished=False
+        self.device=device
     
     def flush(self):
         self.x_coreg_pad=None
