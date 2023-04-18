@@ -108,7 +108,7 @@ def geographical_splitter(images, labels, filenames, test_size_percentage, seed=
     
     real_percentage=(n_events_test + n_not_events_test)/len(labels)
     
-    if real_percentage - test_size_percentage > split_percentage_error_tolerance:
+    if abs(real_percentage - test_size_percentage) > split_percentage_error_tolerance:
         raise ValueError("Impossible to perform datatest TRAIN/EVAL " + str(test_size_percentage) +" splitting with tolerance: " +str(split_percentage_error_tolerance * 100)+" % by using SEED: "+str(seed)+". Try to change seed.")
 
     # Images and labels for trains
