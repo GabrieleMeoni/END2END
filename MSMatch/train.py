@@ -130,7 +130,11 @@ def main_worker(gpu, ngpus_per_node, args):
     train_dset = SSL_Dataset(
         name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio,upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
     )
-    lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
+    if args.supervised:
+        lb_dset = train_dset.get_dset()
+        ulb_dset = None
+    else:
+        lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
 
     args.num_classes = train_dset.num_classes
     args.num_channels = train_dset.num_channels
@@ -352,6 +356,9 @@ if __name__ == "__main__":
         type=int,
         default=1024,
         help="batch size of evaluation data loader (it does not affect the accuracy)",
+    )
+    parser.add_argument(
+        "--supervised", action="store_true", help="if used, supervised training will be performed."
     )
 
     parser.add_argument("--hard_label", type=bool, default=True)

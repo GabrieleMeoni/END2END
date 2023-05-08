@@ -1,5 +1,5 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=2
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
@@ -23,7 +23,7 @@ URL_DIST="tcp://127.0.0.1:10007" #change port to avoid conflicts to allow multip
 USE_MCC_FOR_BEST="--use_mcc_for_best" # Leave empty to select best model depending on accuracy. Use use_mcc_for_best to select it depending on the mcc metric.
 #create save location
 mkdir -p $SAVE_LOCATION
-SUPERVISED=""
+SUPERVISED=--supervised
 
 #Upsampling values.
 TRAIN_UPS_NOTEVENT=1
