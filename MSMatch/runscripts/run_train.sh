@@ -7,9 +7,9 @@ DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_r
 TEST_DATASET="thraws_swir_test"  
 NET=efficientnet-lite0 #Options are wideResNet,efficientnet-lite0, efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5,...  
 UNLABELED_RATIO=4 #Unlabeled ratio. 4 means 4 times more unlabeled than labeled data. 
-BATCH_SIZE=18
+BATCH_SIZE=8
 EVAL_SPLIT_RATIO=0.1 #Evaluation split percentage over the whole train/eval dataset.
-N_EPOCH=50                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
+N_EPOCH=70                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000            #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
 SEED=0
@@ -27,13 +27,14 @@ TRAIN_UPS_EVENT=1
 TRAIN_UPS_NOTEVENT=1
 EVAL_UPS_EVENT=1
 EVAL_UPS_NOTEVENT=1
-EVAL_BATCH_SIZE=32
+EVAL_BATCH_SIZE=64
+P_CUTOFF=0.95
 
-NUM_LABELS_USED="600"
+NUM_LABELS_USED="800"
 
 # loop for TRAIN_UPS_EVENT values in the 3,5,7,9:
-for TRAIN_UPS_EVENT in 3 5 7 9; do
-	SAVE_NAME="esr_${EVAL_SPLIT_RATIO}_Ups_t${TRAIN_UPS_EVENT}_n${TRAIN_UPS_NOTEVENT}_e${EVAL_UPS_EVENT}_ne${EVAL_UPS_NOTEVENT}_b${EVAL_BATCH_SIZE}_l${NUM_LABELS_USED}_u${UNLABELED_RATIO}"
+for TRAIN_UPS_EVENT in 5 7 9; do
+	SAVE_NAME="GM_tbs_8_esr_${EVAL_SPLIT_RATIO}_Ups_t${TRAIN_UPS_EVENT}_n${TRAIN_UPS_NOTEVENT}_e${EVAL_UPS_EVENT}_ne${EVAL_UPS_NOTEVENT}_b${EVAL_BATCH_SIZE}_l${NUM_LABELS_USED}_u${UNLABELED_RATIO}"
 	#switch to fixmatch folder for execution
 	cd $FIXMATCH_FOLDER
 	echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
