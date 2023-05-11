@@ -33,7 +33,7 @@ EVAL_BATCH_SIZE=64
 P_CUTOFF=0.95
 
 NUM_LABELS_USED="800"
-
+SAVE_DIR=$SAVE_DIR/"Seed_"/$SEED
 #switch to fixmatch folder for execution
 cd $FIXMATCH_FOLDER
 for ups_event_eval in 1
