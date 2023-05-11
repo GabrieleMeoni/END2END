@@ -1,9 +1,9 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=5
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_DIR="paper_train_unsupervised"                              
+SAVE_DIR="paper_train_msmatch"                              
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
@@ -14,7 +14,7 @@ EVAL_SPLIT_RATIO=0.1 #Evaluation split percentage over the whole train/eval data
 N_EPOCH=70                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000             #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
-SEED=0
+SEED=9
 WEIGHT_DECAY=0.00075
 LR=0.03
 RED='\033[0;31m'
