@@ -3,7 +3,7 @@ export CUDA_VISIBLE_DEVICES=3
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_NAME="paper_train"                             
+SAVE_DIR="paper_train_unsupervised"                              
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
@@ -43,7 +43,7 @@ for ups_event_eval in 1
 		echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 		TRAIN_UPS_EVENT=$ups_event_train
 		EVAL_UPS_EVENT=$ups_event_eval
-		SAVE_NAME=$SAVE_NAME/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
+		SAVE_NAME=$SAVE_DIR/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
 		echo -e "Upsampling events: TRAIN=${RED}$TRAIN_UPS_EVENT EVAL=$EVAL_UPS_EVENT ${BLACK}."
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]

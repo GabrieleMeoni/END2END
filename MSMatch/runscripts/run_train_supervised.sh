@@ -1,9 +1,9 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=3
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_NAME="paper_train"                             
+SAVE_DIR="paper_train"                             
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
@@ -14,7 +14,7 @@ EVAL_SPLIT_RATIO=0.1 #Evaluation split percentage over the whole train/eval data
 N_EPOCH=70                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000             #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
-SEED=0
+SEED=9
 WEIGHT_DECAY=0.00075
 LR=0.03
 RED='\033[0;31m'
@@ -33,7 +33,7 @@ EVAL_BATCH_SIZE=64
 P_CUTOFF=0.95
 
 NUM_LABELS_USED="800"
-
+SAVE_DIR=$SAVE_DIR/"Seed_"$SEED
 #switch to fixmatch folder for execution
 cd $FIXMATCH_FOLDER
 for ups_event_eval in 1
@@ -43,7 +43,7 @@ for ups_event_eval in 1
 		echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 		TRAIN_UPS_EVENT=$ups_event_train
 		EVAL_UPS_EVENT=$ups_event_eval
-		SAVE_NAME=$SAVE_NAME/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
+		SAVE_NAME=$SAVE_DIR/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
 		echo -e "Upsampling events: TRAIN=${RED}$TRAIN_UPS_EVENT EVAL=$EVAL_UPS_EVENT ${BLACK}."
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]
