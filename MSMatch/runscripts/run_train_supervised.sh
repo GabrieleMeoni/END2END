@@ -1,9 +1,9 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=4
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_DIR="paper_train"                             
+SAVE_DIR="final_train_supervised"                             
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
@@ -14,7 +14,7 @@ EVAL_SPLIT_RATIO=0.1 #Evaluation split percentage over the whole train/eval data
 N_EPOCH=70                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000             #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
-SEED=9
+SEED=18
 WEIGHT_DECAY=0.00075
 LR=0.03
 RED='\033[0;31m'
@@ -24,6 +24,7 @@ USE_MCC_FOR_BEST="--use_mcc_for_best" # Leave empty to select best model dependi
 #create save location
 mkdir -p $SAVE_LOCATION
 SUPERVISED=--supervised
+
 
 #Upsampling values.
 TRAIN_UPS_NOTEVENT=1
@@ -45,19 +46,22 @@ for ups_event_eval in 1
 		EVAL_UPS_EVENT=$ups_event_eval
 		SAVE_NAME=$SAVE_DIR/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
 		echo -e "Upsampling events: TRAIN=${RED}$TRAIN_UPS_EVENT EVAL=$EVAL_UPS_EVENT ${BLACK}."
+		WEIGHT_E=$(bc -l <<< "4636 / $ups_event_train / 5033")
+		WEIGHT_NE=$(bc -l <<< "397 * $ups_event_train / 5033" )
+		LOSS_WEIGHT="[0${WEIGHT_NE},0${WEIGHT_E}]"
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]
 		then
 			echo -e "${RED} Multi-GPU mode ${BLACK}"
 			for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 				#Remove "echo" to launch the script.
-				python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED
+				python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED --loss_weight ${LOSS_WEIGHT}
 				wait
 			done
 		else
 			for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 				#Remove "echo" to launch the script.
-				python train.py --p_cutoff $P_CUTOFF --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED
+				python train.py --p_cutoff $P_CUTOFF --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED --loss_weight ${LOSS_WEIGHT}
 				wait
 			done
 		fi

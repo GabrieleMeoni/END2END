@@ -1,5 +1,5 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=6
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
@@ -38,26 +38,29 @@ SAVE_DIR=$SAVE_DIR/"Seed_"/$SEED
 cd $FIXMATCH_FOLDER
 for ups_event_eval in 1
 	do
-	for ups_event_train in 2 3 4 6 7
+	for ups_event_train in 2 #3 4 6 7
 		do
 		echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 		TRAIN_UPS_EVENT=$ups_event_train
 		EVAL_UPS_EVENT=$ups_event_eval
 		SAVE_NAME=$SAVE_DIR/"hyperExplore_upsTrain_{$TRAIN_UPS_EVENT}_upsEval_{$EVAL_UPS_EVENT}" 
 		echo -e "Upsampling events: TRAIN=${RED}$TRAIN_UPS_EVENT EVAL=$EVAL_UPS_EVENT ${BLACK}."
+		WEIGHT_E=$(bc -l <<< "4636 / $ups_event_train / 5033")
+		WEIGHT_NE=$(bc -l <<< "397 * $ups_event_train / 5033" )
+		LOSS_WEIGHT="[0${WEIGHT_E},0${WEIGHT_NE}]"
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]
 		then
 			echo -e "${RED} Multi-GPU mode ${BLACK}"
 			for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 				#Remove "echo" to launch the script.
-				python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED
+				python train.py --weight_decay $WEIGHT_DECAY --world-size 1 --rank 0 --multiprocessing-distributed --dist-url $URL_DIST --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED --loss_weight ${LOSS_WEIGHT}
 				wait
 			done
 		else
 			for NUM_LABELS in $NUM_LABELS_USED; do #Note: they are the total number of labels, not per class.
 				#Remove "echo" to launch the script.
-				python train.py --p_cutoff $P_CUTOFF --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED
+				python train.py --p_cutoff $P_CUTOFF --weight_decay $WEIGHT_DECAY --rank 0 --gpu $DEVICE --lr $LR --batch_size $BATCH_SIZE --num_train_iter $NUM_TRAIN_ITER --num_eval_iter $NUM_EVAL_ITER --num_labels $NUM_LABELS --save_name $SAVE_NAME --save_dir $SAVE_LOCATION --dataset $DATASET --net $NET --seed $SEED --uratio $UNLABELED_RATIO --train_upsample_event $TRAIN_UPS_EVENT --train_upsample_notevent $TRAIN_UPS_NOTEVENT --eval_upsample_event $EVAL_UPS_EVENT --eval_upsample_notevent $EVAL_UPS_NOTEVENT --overwrite $USE_MCC_FOR_BEST --test_dataset $TEST_DATASET --eval_split_ratio $EVAL_SPLIT_RATIO --eval_batch_size $EVAL_BATCH_SIZE $SUPERVISED --loss_weight ${LOSS_WEIGHT}
 				wait
 			done
 		fi

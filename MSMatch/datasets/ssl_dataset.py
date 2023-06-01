@@ -120,6 +120,7 @@ class SSL_Dataset:
 
         elif self.name == "thraws_swir_test":
             dset = THRAWS_test_dataset(root_dir=self.data_dir)
+            self.data_dir=dset.root_dir
         
 
         if self.name == "cifar10":

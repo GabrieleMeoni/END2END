@@ -185,7 +185,7 @@ class FixMatch:
                     T = self.t_fn(self.it)
                     p_cutoff = self.p_fn(self.it)
 
-                    sup_loss = ce_loss(logits_x_lb, y_lb, reduction="mean")
+                    sup_loss = ce_loss(logits_x_lb, y_lb, args.loss_weight, reduction="mean")
                     if not args.supervised:
                         unsup_loss, mask = consistency_loss(
                             logits_x_ulb_w,
@@ -311,7 +311,7 @@ class FixMatch:
                     logits = self.train_model(inputs)
                     logits_x_lb = logits[:num_lb]
                     del logits
-                    sup_loss = ce_loss(logits_x_lb, y_lb, reduction="mean")
+                    sup_loss = ce_loss(logits_x_lb, y_lb, args.loss_weight, reduction="mean")
 
                     total_loss = sup_loss
 

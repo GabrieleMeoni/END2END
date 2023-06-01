@@ -139,6 +139,16 @@ def main_worker(gpu, ngpus_per_node, args):
     args.num_classes = train_dset.num_classes
     args.num_channels = train_dset.num_channels
 
+    if args.loss_weight is None:
+        loss_weight = torch.tensor([1.0 for n in range(len(train_dset.num_classes))])
+    else:
+        loss_weight=torch.tensor([float(args.loss_weight[1:-1].split(",")[0]), float(args.loss_weight[1:-1].split(",")[1])])
+
+    if torch.cuda.is_available():
+        loss_weight=loss_weight.cuda()
+    
+    args.loss_weight=loss_weight
+
     _eval_dset = SSL_Dataset(
         name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
     )
@@ -359,6 +369,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--supervised", action="store_true", help="if used, supervised training will be performed."
+    )
+
+    parser.add_argument(
+        "--loss_weight", default=None, help="Weights for loss. If None, all 1s will be used."
     )
 
     parser.add_argument("--hard_label", type=bool, default=True)
