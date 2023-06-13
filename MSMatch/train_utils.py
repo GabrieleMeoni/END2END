@@ -192,7 +192,7 @@ def mcc(output, target):
             target_c=target
     return mcc(pred_c, target_c)
 
-def ce_loss(logits, targets, weight, use_hard_labels=True, reduction="none"):
+def ce_loss(logits, targets, weight=None, use_hard_labels=True, reduction="none"):
     """
     wrapper for cross entropy loss in pytorch.
     
@@ -203,7 +203,10 @@ def ce_loss(logits, targets, weight, use_hard_labels=True, reduction="none"):
         use_hard_labels: If True, targets have [Batch size] shape with int values. If False, the target is vector (default True)
     """
     if use_hard_labels:
-        return F.cross_entropy(logits, targets.long(), weight=weight, reduction=reduction)
+        if weight is not None:
+            return F.cross_entropy(logits, targets.long(), weight=weight, reduction=reduction)
+        else:
+            return F.cross_entropy(logits, targets.long(), reduction=reduction)
     else:
         assert logits.shape == targets.shape
         log_pred = F.log_softmax(logits, dim=-1)

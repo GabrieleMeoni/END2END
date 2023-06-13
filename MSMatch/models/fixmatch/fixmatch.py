@@ -190,6 +190,7 @@ class FixMatch:
                         unsup_loss, mask = consistency_loss(
                             logits_x_ulb_w,
                             logits_x_ulb_s,
+                            args.loss_weight,
                             "ce",
                             T,
                             p_cutoff,
