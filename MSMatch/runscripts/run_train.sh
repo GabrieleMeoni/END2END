@@ -31,7 +31,6 @@ EVAL_UPS_EVENT=1
 EVAL_UPS_NOTEVENT=1
 EVAL_BATCH_SIZE=64
 P_CUTOFF=0.95
-
 NUM_LABELS_USED="800"
 SAVE_DIR=$SAVE_DIR/"Seed_"/$SEED
 #switch to fixmatch folder for execution
@@ -48,6 +47,7 @@ for ups_event_eval in 1
 		WEIGHT_E=$(bc -l <<< "4636 / $ups_event_train / 5033")
 		WEIGHT_NE=$(bc -l <<< "397 * $ups_event_train / 5033" )
 		LOSS_WEIGHT="[0${WEIGHT_E},0${WEIGHT_NE}]"
+
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]
 		then

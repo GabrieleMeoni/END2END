@@ -95,5 +95,5 @@ Distributed under the GPL-3.0 License.
 ## Contact
 Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/).
 
-* Gabriele Meoni - gabriele.meoni at esa.int
+* Gabriele Meoni - Currently with TU Delft: G.Meoni@tudelft.nl
 * Roberto Del Prete - roberto.delprete at ext.esa.int
