@@ -150,141 +150,259 @@ class FixMatch:
 
         scaler = GradScaler()
         amp_cm = autocast if args.amp else contextlib.nullcontext
-        for (x_lb, y_lb), (x_ulb_w, x_ulb_s, _) in zip(
-            self.loader_dict["train_lb"], self.loader_dict["train_ulb"]
-        ):
+        if not args.supervised:
+            for (x_lb, y_lb), (x_ulb_w, x_ulb_s, _) in zip(
+                self.loader_dict["train_lb"], self.loader_dict["train_ulb"]
+            ):
 
-            # prevent the training iterations exceed args.num_train_iter
-            if self.it > args.num_train_iter:
-                break
+                # prevent the training iterations exceed args.num_train_iter
+                if self.it > args.num_train_iter:
+                    break
 
-            end_batch.record()
-            torch.cuda.synchronize()
-            start_run.record()
+                end_batch.record()
+                torch.cuda.synchronize()
+                start_run.record()
 
-            num_lb = x_lb.shape[0]
-            num_ulb = x_ulb_w.shape[0]
-            assert num_ulb == x_ulb_s.shape[0]
+                num_lb = x_lb.shape[0]
+                num_ulb = x_ulb_w.shape[0]
+                assert num_ulb == x_ulb_s.shape[0]
 
-            x_lb, x_ulb_w, x_ulb_s = (
-                x_lb.cuda(args.gpu),
-                x_ulb_w.cuda(args.gpu),
-                x_ulb_s.cuda(args.gpu),
-            )
-            y_lb = y_lb.cuda(args.gpu)
+                x_lb, x_ulb_w, x_ulb_s = (x_lb.cuda(args.gpu),x_ulb_w.cuda(args.gpu),x_ulb_s.cuda(args.gpu))
+                
+                inputs = torch.cat((x_lb, x_ulb_w, x_ulb_s))
+                y_lb = y_lb.cuda(args.gpu)
 
-            inputs = torch.cat((x_lb, x_ulb_w, x_ulb_s))
+                
+                # inference and calculate sup/unsup losses
+                with amp_cm():
+                    logits = self.train_model(inputs)
+                    logits_x_lb = logits[:num_lb]
+                    if not args.supervised:
+                        logits_x_ulb_w, logits_x_ulb_s = logits[num_lb:].chunk(2)
+                    del logits
 
-            # inference and calculate sup/unsup losses
-            with amp_cm():
-                logits = self.train_model(inputs)
-                logits_x_lb = logits[:num_lb]
-                logits_x_ulb_w, logits_x_ulb_s = logits[num_lb:].chunk(2)
-                del logits
+                    # hyper-params for update
+                    T = self.t_fn(self.it)
+                    p_cutoff = self.p_fn(self.it)
 
-                # hyper-params for update
-                T = self.t_fn(self.it)
-                p_cutoff = self.p_fn(self.it)
-
-                sup_loss = ce_loss(logits_x_lb, y_lb, reduction="mean")
-                unsup_loss, mask = consistency_loss(
-                    logits_x_ulb_w,
-                    logits_x_ulb_s,
-                    "ce",
-                    T,
-                    p_cutoff,
-                    use_hard_labels=args.hard_label,
-                )
-
-                total_loss = sup_loss + self.lambda_u * unsup_loss
-
-            # parameter updates
-            if args.amp:
-                scaler.scale(total_loss).backward()
-                scaler.step(self.optimizer)
-                scaler.update()
-            else:
-                total_loss.backward()
-                self.optimizer.step()
-
-            self.scheduler.step()
-            self.train_model.zero_grad()
-
-            with torch.no_grad():
-                self._eval_model_update()
-                train_accuracy = accuracy(logits_x_lb, y_lb)
-                train_accuracy = train_accuracy[0]
-                train_mcc = mcc(logits_x_lb, y_lb)
-
-            end_run.record()
-            torch.cuda.synchronize()
-
-            # tensorboard_dict update
-            tb_dict = {}
-            tb_dict["train/sup_loss"] = sup_loss.detach()
-            tb_dict["train/unsup_loss"] = unsup_loss.detach()
-            tb_dict["train/total_loss"] = total_loss.detach()
-            tb_dict["train/mask_ratio"] = 1.0 - mask.detach()
-            tb_dict["lr"] = self.optimizer.param_groups[0]["lr"]
-            tb_dict["train/prefetch_time"] = (
-                start_batch.elapsed_time(end_batch) / 1000.0
-            )
-            tb_dict["train/run_time"] = start_run.elapsed_time(end_run) / 1000.0
-            tb_dict["train/top-1-acc"] = train_accuracy
-            tb_dict["train/mcc"]=train_mcc
-
-            progressbar.set_postfix_str(f"Total Loss={total_loss.detach():.3e}")
-            progressbar.update(1)
-
-            if self.it % self.num_eval_iter == 0:
-                progressbar.close()
-                curr_epoch += 1
-
-                eval_dict = self.evaluate(args=args)
-                tb_dict.update(eval_dict)
-
-                save_path = os.path.join(args.save_dir, args.save_name)
-
-                if self.use_mcc_for_best:
-                    if tb_dict["eval/mcc"] > best_eval_mcc:
-                        best_eval_mcc = tb_dict["eval/mcc"]
-                        best_it = self.it
-
-                    if tb_dict["eval/top-1-acc"] > best_eval_acc:
-                        best_eval_acc = tb_dict["eval/top-1-acc"]
+                    sup_loss = ce_loss(logits_x_lb, y_lb, args.loss_weight, reduction="mean")
+                    if not args.supervised:
+                        unsup_loss, mask = consistency_loss(
+                            logits_x_ulb_w,
+                            logits_x_ulb_s,
+                            args.loss_weight,
+                            "ce",
+                            T,
+                            p_cutoff,
+                            use_hard_labels=args.hard_label,
+                        )
+                    else:
+                        unsup_loss = torch.zeros_like(logits_x_lb)
+                        mask=torch.ones_like(logits_x_lb)
                     
-                    self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}")
+                    total_loss = sup_loss + self.lambda_u * unsup_loss
+
+                # parameter updates
+                if args.amp:
+                    scaler.scale(total_loss).backward()
+                    scaler.step(self.optimizer)
+                    scaler.update()
                 else:
-                    if tb_dict["eval/top-1-acc"] > best_eval_acc:
-                        best_eval_acc = tb_dict["eval/top-1-acc"]
-                        best_it = self.it
+                    total_loss.backward()
+                    self.optimizer.step()
 
-                    if tb_dict["eval/mcc"] > best_eval_mcc:
-                        best_eval_mcc = tb_dict["eval/mcc"]
+                self.scheduler.step()
+                self.train_model.zero_grad()
+
+                with torch.no_grad():
+                    self._eval_model_update()
+                    train_accuracy = accuracy(logits_x_lb, y_lb)
+                    train_accuracy = train_accuracy[0]
+                    train_mcc = mcc(logits_x_lb, y_lb)
+
+                end_run.record()
+                torch.cuda.synchronize()
+
+                # tensorboard_dict update
+                tb_dict = {}
+                tb_dict["train/sup_loss"] = sup_loss.detach()
+                tb_dict["train/unsup_loss"] = unsup_loss.detach()
+                tb_dict["train/total_loss"] = total_loss.detach()
+                tb_dict["train/mask_ratio"] = 1.0 - mask.detach()
+                tb_dict["lr"] = self.optimizer.param_groups[0]["lr"]
+                tb_dict["train/prefetch_time"] = (
+                    start_batch.elapsed_time(end_batch) / 1000.0
+                )
+                tb_dict["train/run_time"] = start_run.elapsed_time(end_run) / 1000.0
+                tb_dict["train/top-1-acc"] = train_accuracy
+                tb_dict["train/mcc"]=train_mcc
+
+                progressbar.set_postfix_str(f"Total Loss={total_loss.detach():.3e}")
+                progressbar.update(1)
+
+                if self.it % self.num_eval_iter == 0:
+                    progressbar.close()
+                    curr_epoch += 1
+
+                    eval_dict = self.evaluate(args=args)
+                    tb_dict.update(eval_dict)
+
+                    save_path = os.path.join(args.save_dir, args.save_name)
+
+                    if self.use_mcc_for_best:
+                        if tb_dict["eval/mcc"] > best_eval_mcc:
+                            best_eval_mcc = tb_dict["eval/mcc"]
+                            best_it = self.it
+
+                        if tb_dict["eval/top-1-acc"] > best_eval_acc:
+                            best_eval_acc = tb_dict["eval/top-1-acc"]
+                        
+                        self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}")
+                    else:
+                        if tb_dict["eval/top-1-acc"] > best_eval_acc:
+                            best_eval_acc = tb_dict["eval/top-1-acc"]
+                            best_it = self.it
+
+                        if tb_dict["eval/mcc"] > best_eval_mcc:
+                            best_eval_mcc = tb_dict["eval/mcc"]
+                        
+                        self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}")
+
                     
-                    self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}")
+
+                    progressbar = tqdm(
+                        desc=f"Epoch {curr_epoch}/{total_epochs}", total=args.num_eval_iter
+                    )
+
+                if not args.multiprocessing_distributed or (
+                    args.multiprocessing_distributed and args.rank % ngpus_per_node == 0
+                ):
+
+                    if self.it == best_it:
+                        self.save_model("model_best.pth", save_path)
+
+                    if not self.tb_log is None:
+                        self.tb_log.update(tb_dict, self.it)
+
+                self.it += 1
+                del tb_dict
+                start_batch.record()
+                if self.it > 2 ** 19:
+                    self.num_eval_iter = 1000
+        else:
+            for (x_lb, y_lb) in  self.loader_dict["train_lb"]:
+
+                # prevent the training iterations exceed args.num_train_iter
+                if self.it > args.num_train_iter:
+                    break
+
+                end_batch.record()
+                torch.cuda.synchronize()
+                start_run.record()
+
+                num_lb = x_lb.shape[0]
+
+                inputs=x_lb.cuda(args.gpu)
+                y_lb = y_lb.cuda(args.gpu)
 
                 
 
-                progressbar = tqdm(
-                    desc=f"Epoch {curr_epoch}/{total_epochs}", total=args.num_eval_iter
+                # inference and calculate sup/unsup losses
+                with amp_cm():
+                    logits = self.train_model(inputs)
+                    logits_x_lb = logits[:num_lb]
+                    del logits
+                    sup_loss = ce_loss(logits_x_lb, y_lb, args.loss_weight, reduction="mean")
+
+                    total_loss = sup_loss
+
+                # parameter updates
+                if args.amp:
+                    scaler.scale(total_loss).backward()
+                    scaler.step(self.optimizer)
+                    scaler.update()
+                else:
+                    total_loss.backward()
+                    self.optimizer.step()
+
+                self.scheduler.step()
+                self.train_model.zero_grad()
+
+                with torch.no_grad():
+                    self._eval_model_update()
+                    train_accuracy = accuracy(logits_x_lb, y_lb)
+                    train_accuracy = train_accuracy[0]
+                    train_mcc = mcc(logits_x_lb, y_lb)
+
+                end_run.record()
+                torch.cuda.synchronize()
+
+                # tensorboard_dict update
+                tb_dict = {}
+                tb_dict["train/sup_loss"] = sup_loss.detach()
+                tb_dict["train/unsup_loss"] = 0
+                tb_dict["train/total_loss"] = total_loss.detach()
+                tb_dict["train/mask_ratio"] = 0.0
+                tb_dict["lr"] = self.optimizer.param_groups[0]["lr"]
+                tb_dict["train/prefetch_time"] = (
+                    start_batch.elapsed_time(end_batch) / 1000.0
                 )
+                tb_dict["train/run_time"] = start_run.elapsed_time(end_run) / 1000.0
+                tb_dict["train/top-1-acc"] = train_accuracy
+                tb_dict["train/mcc"]=train_mcc
 
-            if not args.multiprocessing_distributed or (
-                args.multiprocessing_distributed and args.rank % ngpus_per_node == 0
-            ):
+                progressbar.set_postfix_str(f"Total Loss={total_loss.detach():.3e}")
+                progressbar.update(1)
 
-                if self.it == best_it:
-                    self.save_model("model_best.pth", save_path)
+                if self.it % self.num_eval_iter == 0:
+                    progressbar.close()
+                    curr_epoch += 1
 
-                if not self.tb_log is None:
-                    self.tb_log.update(tb_dict, self.it)
+                    eval_dict = self.evaluate(args=args)
+                    tb_dict.update(eval_dict)
 
-            self.it += 1
-            del tb_dict
-            start_batch.record()
-            if self.it > 2 ** 19:
-                self.num_eval_iter = 1000
+                    save_path = os.path.join(args.save_dir, args.save_name)
+
+                    if self.use_mcc_for_best:
+                        if tb_dict["eval/mcc"] > best_eval_mcc:
+                            best_eval_mcc = tb_dict["eval/mcc"]
+                            best_it = self.it
+
+                        if tb_dict["eval/top-1-acc"] > best_eval_acc:
+                            best_eval_acc = tb_dict["eval/top-1-acc"]
+                        
+                        self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}")
+                    else:
+                        if tb_dict["eval/top-1-acc"] > best_eval_acc:
+                            best_eval_acc = tb_dict["eval/top-1-acc"]
+                            best_it = self.it
+
+                        if tb_dict["eval/mcc"] > best_eval_mcc:
+                            best_eval_mcc = tb_dict["eval/mcc"]
+                        
+                        self.print_fn(f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}")
+
+                    
+
+                    progressbar = tqdm(
+                        desc=f"Epoch {curr_epoch}/{total_epochs}", total=args.num_eval_iter
+                    )
+
+                if not args.multiprocessing_distributed or (
+                    args.multiprocessing_distributed and args.rank % ngpus_per_node == 0
+                ):
+
+                    if self.it == best_it:
+                        self.save_model("model_best.pth", save_path)
+
+                    if not self.tb_log is None:
+                        self.tb_log.update(tb_dict, self.it)
+
+                self.it += 1
+                del tb_dict
+                start_batch.record()
+                if self.it > 2 ** 19:
+                    self.num_eval_iter = 1000
 
         eval_dict = self.evaluate(args=args)
         eval_dict.update({"eval/best_acc": best_eval_acc, "eval/best_it": best_it})
