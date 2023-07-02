@@ -92,7 +92,7 @@ Once you have trained your model, you can implement the trained model on the edg
 In the frame of the END2END project, we aim to implement a mock-up of a full on-board payload processing chain from the sensor to the classification with minimal pre-processing. <br>
 The processing chain includes: 
 
-- **Coarse spatial bands registration**: it is a simple but coarse bands registration technique based on the solution described in the[THRawS](https://arxiv.org/abs/2305.11891) paper. The coregistration technique is lightweight and consists of a simple spatial shift that compensates the average [along-track, across-track] displacements between each couple of bands. The coarse band registratio is performed in an onboard processor.
+- **Coarse spatial bands registration**: it is a simple but coarse bands registration technique based on the solution described in the [THRawS](https://arxiv.org/abs/2305.11891) paper. The coregistration technique is lightweight and consists of a simple spatial shift that compensates the average [along-track, across-track] displacements between each couple of bands. The coarse band registratio is performed in an onboard processor.
 
 - **Demosaicking**: this steps simply splits an entire [Sentinel-2 Raw granule](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-granule) into 256x256 patches. The `patch engine` is responsible for performing the granule demosaicking and is implemented in the onboard processor
 
