@@ -74,7 +74,9 @@ Now, you should be able to work with the NCS2 device.
 
 ## END2END dataset
 The dataset used for END2END is based on [THRawS](https://arxiv.org/abs/2305.11891). `THRawS` (Thermal Hotspots on Raw Sentinel-2 data) is a Sentinel-2 dataset containing raw granules including annotated thermal anomalies. <br>
-`THRawS` was preprocessed to extract patches for thermal anomalies classification. To this aim, `ROBERTO TO COMPLEMENT`.
+In particular: 
+- to train the model, the bands [`B8A`, `B11`, `B12`] of the various granules of `THRawS` was preprocessed to extract 256x256 patches for thermal anomalies classification. To this aim, `ROBERTO TO COMPLETE`.
+- for the [onboard payload prototype](#onboard-payload-prototype), the bands [`B8A`, `B11`, `B12`] of [Sentinel-2 Raw granules](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-granule) are grouped in a [TIF](https://en.wikipedia.org/wiki/TIFF) file, representing an easy-to-read version of the THRawS granules without metadata.
 
 ## Workflow to implement a trained model on the edge device 
 Once you have trained your model, you can implement the trained model on the edge device as follows: 
@@ -82,6 +84,23 @@ Once you have trained your model, you can implement the trained model on the edg
   <img src="resources/images/ncs2WorkFlow.drawio.png" alt="Sublime's custom image"/>
 </p>
 
+## Onboard payload prototype
+<p align="center">
+  <img src="resources/images/onboard_prototype.drawio.png" alt="Sublime's custom image"/>
+</p>
+
+In the frame of the END2END project, we aim to implement a mock-up of a full on-board payload processing chain from the sensor to the classification with minimal pre-processing. <br>
+The processing chain includes: 
+
+- **Coarse spatial bands registration**: it is a simple but coarse bands registration technique based on the solution described in the[THRawS](https://arxiv.org/abs/2305.11891) paper. The coregistration technique is lightweight and consists of a simple spatial shift that compensates the average [along-track, across-track] displacements between each couple of bands. The coarse band registratio is performed in an onboard processor.
+
+- **Demosaicking**: this steps simply splits an entire [Sentinel-2 Raw granule](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-granule) into 256x256 patches. The `patch engine` is responsible for performing the granule demosaicking and is implemented in the onboard processor
+
+- **AI inference**: the `AI engine` consists of a trained AI EfficientNet-lite-0 model that processes the cropped 256x256 patches. After being compiled through the dedicated [workflow](#workflow-to-implement-a-trained-model-on-the-edge-device), the dedicated `OpenVino IR` file can be deployed on the `Intel NCS2` or `CogniSat` board.
+
+- **Mosaicking**: the results are, then, mosaicked to allineate each prediction to each corresponding patch. 
+
+The onboard payload prototype processing chain can be now profiled to measure the total processing time. 
 
 ## Contributing
 The ```end2end``` project is open to contributions. To discuss new ideas and applications, please, reach us via email (please, refer to [Contact](#contact)). To report a bug or request a new feature, please, open an [issue](https://github.com/GabrieleMeoni/END2END/issues) to report a bug or to request a new feature. 
