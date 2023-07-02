@@ -2,31 +2,26 @@
 ### END2END: End2end training on S-2 RAW data
 # About the project 
 
-## 🛰️ END2END: Onboard Detection of Thermal Anomalies from Raw Sentinel-2 Data
+## 🛰️ END2END: Onboard classification of Thermal Anomalies on Raw Sentinel-2 Data
 
-The "end2end" package is a comprehensive Python library designed specifically for detecting and analyzing thermal anomalies in Sentinel-2 data onboard. It provides a complete codebase that enables users to replicate experiments, train and test an efficientnet-b0-lite architecture for the identification of thermal anomalies.
+The "end2end" project studies the problem of performing on-board satellite thermal anomalies classification on Sentinel-2 [Raw data](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-data).
+It provides a complete codebase that enables users to replicate experiments, train and test an [EfficientNet-lite-0](https://blog.tensorflow.org/2020/03/higher-accuracy-on-vision-models-with-efficientnet-lite.html) architecture for the classification of thermal anomalies.
 
-## 🌍🧑‍🔬 Key Features:
-
-- Sentinel-2 RAW Data Integration: The "end2end" package seamlessly integrates with Sentinel-2 data, allowing users to access and preprocess the necessary satellite imagery for thermal anomaly detection.
-Efficientnet-b0-lite Architecture: The package utilizes the efficientnet-b0-lite convolutional neural network (CNN) architecture, a lightweight variant of the efficientnet models. This architecture is specifically tailored for efficient processing and analysis of large-scale satellite imagery.
-- Thermal Anomaly Detection: The core functionality of the "end2end" package revolves around training and testing the efficientnet-b0-lite architecture to identify thermal anomalies within the Sentinel-2 data. It employs deep learning techniques to automatically learn the distinguishing features of anomalies and provide accurate detection results.
-- Experiment Replication: Users can reproduce the experiments conducted by the package's developers by utilizing the provided codebase. This ensures transparency and enables researchers to compare their results with the established benchmarks.
-- Data Preprocessing and Augmentation: The package incorporates various data preprocessing techniques to enhance the quality and usability of Sentinel-2 data. Additionally, it includes data augmentation methods to increase the diversity and robustness of the training dataset.
-- Visualization and Analysis: "end2end" includes visualization tools to display and analyze the detected thermal anomalies. These visualizations can help users gain insights into the spatial and temporal distribution of anomalies, facilitating further analysis and decision-making processes.
-
-## 📈📊 Applications:
-In a nutshell 🌰, the "end2end" package provides a powerful and user-friendly framework for detecting thermal anomalies in Sentinel-2 data onboard. By leveraging the efficientnet-b0-lite architecture, it enables efficient and accurate identification of anomalies, making it a valuable resource for researchers, environmental agencies, and other stakeholders involved in satellite-based anomaly detection and monitoring.
 
 ## 🚀👨‍🚀 Easy Reproduction and Quick Adoption
 
-END2END provides the source code of MSMatch online to enable easy reproduction and quick adoption. It hendles well to multispectral raw data and should enable various applications that are currently infeasible.
+END2END is based on the source code of [MSMatch](https://github.com/gomezzz/MSMatch), which was appropriately retailored for our purposes. Indeed, to train the EfficientNet-lite-0 models both semi-supervised and fully-supervised learning where investigated. 
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#about-the-project">About the Project</a></li>
+    <li><a href="#about-the-project">About the Project</a>
+    <ul>
+      <li><a href="#END2END#%EF%B8%8F-end2end-onboard-detection-of-thermal-anomalies-on-raw-sentinel-2-data">END2END: Onboard classification of Thermal Anomalies on Raw Sentinel-2 Data</a></li>
+      <li><a href="#easy-reproduction-and-quick-adoption">Easy Reproduction and Quick Adoption</a></li>
+    </ul>
+    </li>
     <li><a href="#content-of-the-repository">Content of the repository</a></li>
     <li><a href="#installation">Installation</a>
     <ul>
@@ -34,6 +29,8 @@ END2END provides the source code of MSMatch online to enable easy reproduction a
       <li><a href="#set-up-for-the-embedded-hardware-implementation">Set-up for the embedded hardware implementation</a></li>
     </ul>
     </li>
+    <li><a href="#end2end-dataset">END2END dataset </a></li>
+    <li><a href="#workflow-to-implement-a-trained-model-on-the-edge-device">Workflow to implement a trained model on the edge device </a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -75,8 +72,12 @@ If you also want to use the files in the `ncs2` directory, you need to install [
 
 Now, you should be able to work with the NCS2 device. 
 
+## END2END dataset
+The dataset used for END2END is based on [THRawS](https://arxiv.org/abs/2305.11891). `THRawS` (Thermal Hotspots on Raw Sentinel-2 data) is a Sentinel-2 dataset containing raw granules including annotated thermal anomalies. <br>
+`THRawS` was preprocessed to extract patches for thermal anomalies classification. To this aim, `ROBERTO TO COMPLEMENT`.
+
 ## Workflow to implement a trained model on the edge device 
-Once you have trained your model by using [MSMAtch](https://github.com/gomezzz/MSMatch), you can implement the trained model on the edge dvice as follows: 
+Once you have trained your model, you can implement the trained model on the edge device as follows: 
 <p align="center">
   <img src="resources/images/ncs2WorkFlow.drawio.png" alt="Sublime's custom image"/>
 </p>
