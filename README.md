@@ -4,7 +4,7 @@
 
 ## 🛰️ END2END: Onboard classification of Thermal Anomalies on Raw Sentinel-2 Data
 
-The "end2end" project studies the problem of performing on-board satellite thermal anomalies classification on Sentinel-2 [Raw data](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-data).
+The END2END project studies the problem of performing on-board satellite thermal anomalies classification on Sentinel-2 [Raw data](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-data).
 It provides a complete codebase that enables users to replicate experiments, train and test an [EfficientNet-lite-0](https://blog.tensorflow.org/2020/03/higher-accuracy-on-vision-models-with-efficientnet-lite.html) architecture for the classification of thermal anomalies.
 
 
