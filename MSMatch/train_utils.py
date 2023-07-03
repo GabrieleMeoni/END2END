@@ -87,7 +87,6 @@ def get_OPT(
             nesterov=nesterov,
         )
     elif name == "Adam" or name == "ADAM":
-
         if lr > 0.005:
             raise ValueError(
                 "Learning rate is " + str(lr) + ". That is too high for ADAM."
@@ -104,7 +103,10 @@ def get_OPT(
         per_param_args = [{"params": decay}, {"params": no_decay, "weight_decay": 0.0}]
 
         optimizer = torch.optim.Adam(
-            per_param_args, lr=lr, betas=(0.9, 0.999), weight_decay=weight_decay,
+            per_param_args,
+            lr=lr,
+            betas=(0.9, 0.999),
+            weight_decay=weight_decay,
         )
 
     return optimizer
@@ -144,12 +146,12 @@ def get_cosine_schedule_with_warmup(
 def accuracy(output, target, topk=(1,)):
     """
     Computes the accuracy over the k top predictions for the specified values of k
-    
+
     Args
         output: logits or probs (num of batch, num of classes)
         target: (num of batch, 1) or (num of batch, )
         topk: list of returned k
-    
+
     refer: https://github.com/pytorch/examples/blob/master/imagenet/main.py
     """
 
@@ -174,6 +176,7 @@ def accuracy(output, target, topk=(1,)):
         # np.shape(res): [k, 1]
         return res
 
+
 def mcc(output, target):
     """
     Computes the Matthews Correlation Coefficient.
@@ -185,17 +188,18 @@ def mcc(output, target):
     """
     mcc = MatthewsCorrCoef()
     with torch.no_grad():
-        pred_c=torch.argmax(output, axis=1)
+        pred_c = torch.argmax(output, axis=1)
         if len(target.shape) > 1:
-            target_c=torch.argmax(target, axis=1)
+            target_c = torch.argmax(target, axis=1)
         else:
-            target_c=target
+            target_c = target
     return mcc(pred_c, target_c)
+
 
 def ce_loss(logits, targets, weight=None, use_hard_labels=True, reduction="none"):
     """
     wrapper for cross entropy loss in pytorch.
-    
+
     Args
         logits: logit values, shape=[Batch size, # of classes]
         targets: integer or vector, shape=[Batch size] or [Batch size, # of classes]
@@ -204,7 +208,9 @@ def ce_loss(logits, targets, weight=None, use_hard_labels=True, reduction="none"
     """
     if use_hard_labels:
         if weight is not None:
-            return F.cross_entropy(logits, targets.long(), weight=weight, reduction=reduction)
+            return F.cross_entropy(
+                logits, targets.long(), weight=weight, reduction=reduction
+            )
         else:
             return F.cross_entropy(logits, targets.long(), reduction=reduction)
     else:
@@ -212,5 +218,3 @@ def ce_loss(logits, targets, weight=None, use_hard_labels=True, reduction="none"
         log_pred = F.log_softmax(logits, dim=-1)
         nll_loss = torch.sum(-targets * log_pred, dim=1)
         return nll_loss
-    
-

@@ -5,9 +5,8 @@ from skimage import img_as_ubyte
 from sklearn import preprocessing
 import torch
 from tqdm import tqdm
-import pandas as pd 
+import pandas as pd
 import numpy as np
-
 
 
 class THRAWS_test_dataset(torch.utils.data.Dataset):
@@ -47,10 +46,8 @@ class THRAWS_test_dataset(torch.utils.data.Dataset):
         img = img / 4095  # scale to 0 to 1
         return img
 
-
     def _load_data(self):
-        """Loads the data from the passed root directory. Splits in test/train based on seed. By default resized to 256,256
-        """
+        """Loads the data from the passed root directory. Splits in test/train based on seed. By default resized to 256,256"""
         images = np.zeros([self.N, self.size[0], self.size[1], 3], dtype="uint8")
         labels = []
         filenames = []
@@ -65,7 +62,9 @@ class THRAWS_test_dataset(torch.utils.data.Dataset):
                 sub_f = os.path.join(f, subitem)
                 filenames.append(sub_f)
                 # a few images are a few pixels off, we will resize them
-                images[i] = img_as_ubyte(self._normalize_to_0_to_1(pd.read_pickle(sub_f)))
+                images[i] = img_as_ubyte(
+                    self._normalize_to_0_to_1(pd.read_pickle(sub_f))
+                )
                 i += 1
                 labels.append(item)
 

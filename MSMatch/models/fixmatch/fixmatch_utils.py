@@ -33,11 +33,14 @@ def consistency_loss(
 
         if use_hard_labels:
             masked_loss = (
-                ce_loss(logits_s, max_idx, weight, use_hard_labels, reduction="none") * mask
+                ce_loss(logits_s, max_idx, weight, use_hard_labels, reduction="none")
+                * mask
             )
         else:
             pseudo_label = torch.softmax(logits_w / T, dim=-1)
-            masked_loss = ce_loss(logits_s, pseudo_label, weight, use_hard_labels) * mask
+            masked_loss = (
+                ce_loss(logits_s, pseudo_label, weight, use_hard_labels) * mask
+            )
         return masked_loss.mean(), mask.mean()
 
     else:

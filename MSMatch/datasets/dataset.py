@@ -53,6 +53,7 @@ class BasicDataset(Dataset):
         self.transform = transform
         if use_strong_transform:
             from .augmentation.randaugment import RandAugment
+
             if strong_transform is None:
                 self.strong_transform = copy.deepcopy(transform)
                 self.strong_transform.transforms.insert(
@@ -82,7 +83,7 @@ class BasicDataset(Dataset):
 
         img = self.data[idx]
         if self.transform is None:
-            print('PUCCIOSTERZA')
+            print("PUCCIOSTERZA")
             return transforms.ToTensor()(img), target
         else:
             if isinstance(img, np.ndarray) and not self.use_ms_augmentations:

@@ -1,0 +1,31 @@
+name: end2end_quantization
+channels:
+- conda-forge
+- pytorch
+- fastchan
+dependencies:
+- python=3.8.10
+- pytorch=1.12.1
+- nncf
+- termcolor
+- torchvision=0.13.1
+- cudatoolkit=11.6
+- tensorboard
+- pillow
+- tqdm
+- scikit-image
+- scikit-learn
+- imageio
+- efficientnet-pytorch
+- pandas
+- seaborn
+- albumentations
+- scipy
+- numpy
+- imgaug
+- nb_conda_kernels
+- fastai
+- pip:
+  - efficientnet_lite_pytorch
+  - efficientnet_lite0_pytorch_model
+  - openvino

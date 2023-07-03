@@ -199,4 +199,3 @@ if __name__ == "__main__":
         val = min_val + float(max_val - min_val) * random.random()
         print(op)
         img = op(test_img, val)
-

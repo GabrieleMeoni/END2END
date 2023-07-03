@@ -14,7 +14,12 @@ class UCMDataset(torch.utils.data.Dataset):
     """UCM dataset."""
 
     def __init__(
-        self, train, root_dir="data/UCMerced_LandUse/Images/", transform=None, seed=42, resize_to=(224, 224)
+        self,
+        train,
+        root_dir="data/UCMerced_LandUse/Images/",
+        transform=None,
+        seed=42,
+        resize_to=(224, 224),
     ):
         """
         Args:
@@ -37,8 +42,7 @@ class UCMDataset(torch.utils.data.Dataset):
         self._load_data()
 
     def _load_data(self):
-        """Loads the data from the passed root directory. Splits in test/train based on seed.
-        """
+        """Loads the data from the passed root directory. Splits in test/train based on seed."""
         images = np.zeros([self.N, self.size[0], self.size[1], 3], dtype="uint8")
         labels = []
         filenames = []

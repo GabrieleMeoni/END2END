@@ -49,8 +49,7 @@ class EurosatDataset(torch.utils.data.Dataset):
         return img
 
     def _load_data(self):
-        """Loads the data from the passed root directory. Splits in test/train based on seed. By default resized to 256,256
-        """
+        """Loads the data from the passed root directory. Splits in test/train based on seed. By default resized to 256,256"""
         images = np.zeros([self.N, self.size[0], self.size[1], 13], dtype="uint8")
         labels = []
         filenames = []
