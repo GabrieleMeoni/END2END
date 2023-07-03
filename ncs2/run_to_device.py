@@ -12,6 +12,16 @@ from datasets.data_utils import get_data_loader
 from openvino import runtime as ov
 
 def get_performance(targets, preds):
+    """Extracts accuracy and MCC performance.
+
+    Args:
+        targets (list): expected classes.
+        preds (list): predicted classes.
+
+    Returns:
+        float: model accuracy.
+        float: model MCC.
+    """
     acc=0
     n=0
     for target, pred in zip(targets, preds):
@@ -55,22 +65,28 @@ def main():
     input_layer = compiled_model.input(0)
     output_layer = compiled_model.output(0)
 
-
+    # Preparing placeholders for targets and predictions and preparing data for the inference.
     predicted=[]
     targets=[]
     test_loader = get_data_loader(test_dset, 1, num_workers=1)
+
+    # Starting timing profiling.
     start_time = time.time()
 
+    # Running the inference on the target device. 
     print(colored("Start testing...", "red"))
     for X, y in test_loader:
         predicted.append(compiled_model([X])[output_layer])
         targets.append(y)
+
+    # Ending timing profiling.
     stop_time = time.time()
     print(colored("Testing finished.", "green"))
     print(colored("Calculating results...", "blue"))
         
+    # Extracting the inference time
     inference_time = (stop_time - start_time)
-
+    # Extracting accuracy and MCC performance
     accuracy, mcc_results = get_performance(targets, predicted)
 
     print("Total inference time[s]: "+colored(str(inference_time), "blue"))
