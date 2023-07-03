@@ -6,7 +6,6 @@ import warnings
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
@@ -18,8 +17,14 @@ from models.fixmatch.fixmatch import FixMatch
 from datasets.ssl_dataset import SSL_Dataset
 from datasets.data_utils import get_data_loader
 
-#THRAWS_SWIR supported seeds between 0 and 50.
-THRAWS_SWIR_SUPPORTED_SEEDS={0.1 : [0, 9, 14, 18, 19, 25, 28, 30, 37], 0.15 : [2, 3, 11, 12, 21, 26, 31, 33, 35, 47], 0.20 : [2, 4, 6, 23, 31, 33, 34, 42, 47, 48, 49], 0.25 : [0, 1, 4, 16, 30, 48], 0.30 : [2, 5, 8, 9, 15, 16, 19, 32, 33, 37, 38, 42, 45]}
+# THRAWS_SWIR supported seeds between 0 and 50.
+THRAWS_SWIR_SUPPORTED_SEEDS = {
+    0.1: [0, 9, 14, 18, 19, 25, 28, 30, 37],
+    0.15: [2, 3, 11, 12, 21, 26, 31, 33, 35, 47],
+    0.20: [2, 4, 6, 23, 31, 33, 34, 42, 47, 48, 49],
+    0.25: [0, 1, 4, 16, 30, 48],
+    0.30: [2, 5, 8, 9, 15, 16, 19, 32, 33, 37, 38, 42, 45],
+}
 
 
 def main(args):
@@ -61,8 +66,6 @@ def main(args):
             "disable data parallelism."
         )
 
-    
-    
     if args.dist_url == "env://" and args.world_size == -1:
         args.world_size = int(os.environ["WORLD_SIZE"])
 
@@ -91,10 +94,17 @@ def main_worker(gpu, ngpus_per_node, args):
 
     assert args.seed is not None
 
-    #Checking supported seed 
-    if args.dataset == "thraws_swir_train"  and not(args.seed in THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio]):
-        raise ValueError("The seed: "+str(args.seed)+" is not supported when dataset thraws_swir is used. \nList of supported seed:", THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio])
-    
+    # Checking supported seed
+    if args.dataset == "thraws_swir_train" and not (
+        args.seed in THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio]
+    ):
+        raise ValueError(
+            "The seed: "
+            + str(args.seed)
+            + " is not supported when dataset thraws_swir is used. \nList of supported seed:",
+            THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio],
+        )
+
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -126,10 +136,18 @@ def main_worker(gpu, ngpus_per_node, args):
     logger = get_logger(args.save_name, save_path, logger_level)
     logger.warning(f"USE GPU: {args.gpu} for training")
 
-    # Construct Dataset
+    # Construct Datasets
     train_dset = SSL_Dataset(
-        name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio,upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
+        name=args.dataset,
+        train=True,
+        data_dir=args.data_dir,
+        seed=args.seed,
+        eval_split_ratio=args.eval_split_ratio,
+        upsample_event=args.train_upsample_event,
+        upsample_notevent=args.train_upsample_notevent,
     )
+
+    # Checking if the supervised or semi-supervised training is used.
     if args.supervised:
         lb_dset = train_dset.get_dset()
         ulb_dset = None
@@ -142,15 +160,26 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.loss_weight is None:
         loss_weight = torch.tensor([1.0 for n in range(len(train_dset.num_classes))])
     else:
-        loss_weight=torch.tensor([float(args.loss_weight[1:-1].split(",")[0]), float(args.loss_weight[1:-1].split(",")[1])])
+        loss_weight = torch.tensor(
+            [
+                float(args.loss_weight[1:-1].split(",")[0]),
+                float(args.loss_weight[1:-1].split(",")[1]),
+            ]
+        )
 
     if torch.cuda.is_available():
-        loss_weight=loss_weight.cuda()
-    
-    args.loss_weight=loss_weight
+        loss_weight = loss_weight.cuda()
+
+    args.loss_weight = loss_weight
 
     _eval_dset = SSL_Dataset(
-        name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
+        name=args.dataset,
+        train=False,
+        data_dir=args.data_dir,
+        seed=args.seed,
+        eval_split_ratio=args.eval_split_ratio,
+        upsample_event=args.eval_upsample_event,
+        upsample_notevent=args.eval_upsample_notevent,
     )
     eval_dset = _eval_dset.get_dset()
 
@@ -182,21 +211,21 @@ def main_worker(gpu, ngpus_per_node, args):
         num_eval_iter=args.num_eval_iter,
         tb_log=tb_log,
         logger=logger,
-        use_mcc_for_best=args.use_mcc_for_best
+        use_mcc_for_best=args.use_mcc_for_best,
     )
 
     logger.info(f"Number of Trainable Params: {count_parameters(model.train_model)}")
     # logger.info(model.train_model)
 
     # SET Optimizer & LR Scheduler
-    ## construct SGD/ADAM and cosine lr scheduler
+    # construct SGD/ADAM and cosine lr scheduler
     optimizer = get_OPT(
         model.train_model, args.opt, args.lr, args.momentum, args.weight_decay
     )
     scheduler = get_cosine_schedule_with_warmup(
         optimizer, args.num_train_iter, num_warmup_steps=args.num_train_iter * 0
     )
-    ## set SGD and cosine lr on FixMatch
+    # set SGD and cosine lr on FixMatch
     model.set_optimizer(optimizer, scheduler)
 
     # SET Devices for (Distributed) DataParallel
@@ -263,7 +292,8 @@ def main_worker(gpu, ngpus_per_node, args):
         dset_dict["eval"], args.eval_batch_size, num_workers=args.num_workers
     )
 
-    ## set DataLoader on FixMatch
+    #
+    # set DataLoader on FixMatch
     model.set_data_loader(loader_dict)
 
     # If args.resume, load checkpoints from args.load_path
@@ -284,35 +314,38 @@ def main_worker(gpu, ngpus_per_node, args):
     logging.warning(f"GPU {args.rank} training is FINISHED")
 
     if args.test_dataset is not None:
-        model_eval=model.eval_model 
+        model_eval = model.eval_model
         model_eval.eval()
         _test_dset = SSL_Dataset(
-        name=args.test_dataset, train=False, data_dir=args.data_dir, seed=args.seed,
+            name=args.test_dataset,
+            train=False,
+            data_dir=args.data_dir,
+            seed=args.seed,
         )
         test_dset = _test_dset.get_dset()
         test_loader = get_data_loader(test_dset, args.batch_size, num_workers=1)
 
         acc = 0.0
         n = 0
-        logger.info(f"--------------------TEST DATASET EVALUATION--------------------")
-        
+        logger.info("--------------------TEST DATASET EVALUATION--------------------")
+
         with torch.no_grad():
             for image, target in test_loader:
                 image = image.type(torch.FloatTensor).cuda()
                 logit = model_eval(image)
                 acc += logit.cpu().max(1)[1].eq(target).sum().numpy()
-                
                 if n == 0:
-                    pred=logit
-                    correct=target
-                    n+=1
+                    pred = logit
+                    correct = target
+                    n += 1
                 else:
-                    pred=torch.cat((pred, logit), axis=0)
-                        
+                    pred = torch.cat((pred, logit), axis=0)
+                    correct = torch.cat((correct, target), axis=0)
 
-                    correct=torch.cat((correct, target), axis=0)
-        logger.info(f"Test accuracy: {acc / len(test_dset)} Test mcc: {mcc(pred, correct)}")
-            
+        logger.info(
+            f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}"
+        )
+
 
 if __name__ == "__main__":
     import argparse
@@ -342,7 +375,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--num_train_iter",
         type=int,
-        default=2 ** 20,
+        default=2**20,
         help="total number of training iterations",
     )
     parser.add_argument(
@@ -368,11 +401,15 @@ if __name__ == "__main__":
         help="batch size of evaluation data loader (it does not affect the accuracy)",
     )
     parser.add_argument(
-        "--supervised", action="store_true", help="if used, supervised training will be performed."
+        "--supervised",
+        action="store_true",
+        help="if used, supervised training will be performed.",
     )
 
     parser.add_argument(
-        "--loss_weight", default=None, help="Weights for loss. If None, all 1s will be used."
+        "--loss_weight",
+        default=None,
+        help="Weights for loss. If None, all 1s will be used.",
     )
 
     parser.add_argument("--hard_label", type=bool, default=True)
@@ -419,7 +456,7 @@ if __name__ == "__main__":
     multi-GPUs & Distributed Training
     """
 
-    ## args for distributed training (from https://github.com/pytorch/examples/blob/master/imagenet/main.py)
+    # args for distributed training (from https://github.com/pytorch/examples/blob/master/imagenet/main.py)
     parser.add_argument(
         "--world-size",
         default=-1,

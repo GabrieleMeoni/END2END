@@ -1,12 +1,9 @@
-from torchvision import datasets, transforms
+from torchvision import transforms
 from torch.utils.data import Dataset
 from .data_utils import get_onehot
-
-
 from PIL import Image
 import numpy as np
 import copy
-import torch
 
 
 class BasicDataset(Dataset):
@@ -51,9 +48,10 @@ class BasicDataset(Dataset):
         self.onehot = onehot
 
         self.transform = transform
- 
+
         if use_strong_transform:
             from .augmentation.randaugment import RandAugment
+
             if strong_transform is None:
                 self.strong_transform = copy.deepcopy(transform)
                 self.strong_transform.transforms.insert(
@@ -82,7 +80,7 @@ class BasicDataset(Dataset):
         # set augmented images
 
         img = self.data[idx]
-        
+
         if self.transform is None:
             return transforms.ToTensor()(img), target
         else:
