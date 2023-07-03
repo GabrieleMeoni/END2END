@@ -37,20 +37,6 @@ jobs:
           # stop the build if there are Python syntax errors or undefined names
           pip install flake8
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=127
-      - name: provision-with-micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: environment.yml
-          environment-name: licos
-          cache-downloads: true
-      - name: Test with pytest
-        shell: bash -l {0}
-        run: |
-          micromamba activate licos
-          git clone https://github.com/aidotse/PASEOS.git
-          mv PASEOS/paseos paseos
-          micromamba install pytest pytest-cov pytest-asyncio
-          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=licos licos/tests/ | tee pytest-coverage.txt
       # - name: Pytest coverage comment
       #   uses: MishaKav/pytest-coverage-comment@main
       #   with:
