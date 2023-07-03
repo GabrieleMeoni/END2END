@@ -14,7 +14,7 @@ import numpy as np
 
 try:  # to test locally by running python randaugment.py
     from .ms_augmentations import ms_augmentation_list
-except: # noqa E722
+except:  # noqa E722
     from ms_augmentations import ms_augmentation_list
 
 

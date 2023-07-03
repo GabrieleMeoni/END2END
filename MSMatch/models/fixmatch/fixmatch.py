@@ -256,7 +256,7 @@ class FixMatch:
                             best_eval_acc = tb_dict["eval/top-1-acc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}" # noqa E501
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}"  # noqa E501
                         )
                     else:
                         if tb_dict["eval/top-1-acc"] > best_eval_acc:
@@ -267,7 +267,7 @@ class FixMatch:
                             best_eval_mcc = tb_dict["eval/mcc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}" # noqa E501
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}"  # noqa E501
                         )
 
                     progressbar = tqdm(
@@ -371,7 +371,7 @@ class FixMatch:
                             best_eval_acc = tb_dict["eval/top-1-acc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}" # noqa E501
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}"  # noqa E501
                         )
                     else:
                         if tb_dict["eval/top-1-acc"] > best_eval_acc:
@@ -382,7 +382,7 @@ class FixMatch:
                             best_eval_mcc = tb_dict["eval/mcc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}" # noqa E501
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}"  # noqa E501
                         )
 
                     progressbar = tqdm(

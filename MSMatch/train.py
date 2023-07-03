@@ -18,11 +18,13 @@ from datasets.ssl_dataset import SSL_Dataset
 from datasets.data_utils import get_data_loader
 
 # THRAWS_SWIR supported seeds between 0 and 50.
-THRAWS_SWIR_SUPPORTED_SEEDS = {0.1 : [0, 9, 14, 18, 19, 25, 28, 30, 37],
-                               0.15 : [2, 3, 11, 12, 21, 26, 31, 33, 35, 47],
-                               0.20 : [2, 4, 6, 23, 31, 33, 34, 42, 47, 48, 49],
-                               0.25 : [0, 1, 4, 16, 30, 48],
-                               0.30 : [2, 5, 8, 9, 15, 16, 19, 32, 33, 37, 38, 42, 45]}
+THRAWS_SWIR_SUPPORTED_SEEDS = {
+    0.1: [0, 9, 14, 18, 19, 25, 28, 30, 37],
+    0.15: [2, 3, 11, 12, 21, 26, 31, 33, 35, 47],
+    0.20: [2, 4, 6, 23, 31, 33, 34, 42, 47, 48, 49],
+    0.25: [0, 1, 4, 16, 30, 48],
+    0.30: [2, 5, 8, 9, 15, 16, 19, 32, 33, 37, 38, 42, 45],
+}
 
 
 def main(args):
@@ -93,10 +95,15 @@ def main_worker(gpu, ngpus_per_node, args):
     assert args.seed is not None
 
     # Checking supported seed
-    if args.dataset == "thraws_swir_train" and not (args.seed in THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio]):
-        raise ValueError("The seed: " + str(args.seed)
-                         + " is not supported when dataset thraws_swir is used. \nList of supported seed:",
-                         THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio])
+    if args.dataset == "thraws_swir_train" and not (
+        args.seed in THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio]
+    ):
+        raise ValueError(
+            "The seed: "
+            + str(args.seed)
+            + " is not supported when dataset thraws_swir is used. \nList of supported seed:",
+            THRAWS_SWIR_SUPPORTED_SEEDS[args.eval_split_ratio],
+        )
 
     random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -131,7 +138,8 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # Construct Datasets
     train_dset = SSL_Dataset(
-        name=args.dataset, train=True,
+        name=args.dataset,
+        train=True,
         data_dir=args.data_dir,
         seed=args.seed,
         eval_split_ratio=args.eval_split_ratio,
@@ -152,7 +160,12 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.loss_weight is None:
         loss_weight = torch.tensor([1.0 for n in range(len(train_dset.num_classes))])
     else:
-        loss_weight = torch.tensor([float(args.loss_weight[1:-1].split(",")[0]), float(args.loss_weight[1:-1].split(",")[1])])
+        loss_weight = torch.tensor(
+            [
+                float(args.loss_weight[1:-1].split(",")[0]),
+                float(args.loss_weight[1:-1].split(",")[1]),
+            ]
+        )
 
     if torch.cuda.is_available():
         loss_weight = loss_weight.cuda()
@@ -198,7 +211,7 @@ def main_worker(gpu, ngpus_per_node, args):
         num_eval_iter=args.num_eval_iter,
         tb_log=tb_log,
         logger=logger,
-        use_mcc_for_best=args.use_mcc_for_best
+        use_mcc_for_best=args.use_mcc_for_best,
     )
 
     logger.info(f"Number of Trainable Params: {count_parameters(model.train_model)}")
@@ -329,7 +342,9 @@ def main_worker(gpu, ngpus_per_node, args):
                     pred = torch.cat((pred, logit), axis=0)
                     correct = torch.cat((correct, target), axis=0)
 
-        logger.info(f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}")
+        logger.info(
+            f"Test accuracy: {acc / len(test_loader)} Test mcc: {mcc(pred, correct)}"
+        )
 
 
 if __name__ == "__main__":
@@ -360,7 +375,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--num_train_iter",
         type=int,
-        default=2 ** 20,
+        default=2**20,
         help="total number of training iterations",
     )
     parser.add_argument(
@@ -386,11 +401,15 @@ if __name__ == "__main__":
         help="batch size of evaluation data loader (it does not affect the accuracy)",
     )
     parser.add_argument(
-        "--supervised", action="store_true", help="if used, supervised training will be performed."
+        "--supervised",
+        action="store_true",
+        help="if used, supervised training will be performed.",
     )
 
     parser.add_argument(
-        "--loss_weight", default=None, help="Weights for loss. If None, all 1s will be used."
+        "--loss_weight",
+        default=None,
+        help="Weights for loss. If None, all 1s will be used.",
     )
 
     parser.add_argument("--hard_label", type=bool, default=True)
