@@ -24,6 +24,6 @@ fi
 
 # check if the folder MSMatch/checkpoints exists:
 if [ ! -d "MSMatch/checkpoints" ]; then
-    python MSMatch/utils.py
+    python MSMatch/download_checkpoints.py
 fi
 
