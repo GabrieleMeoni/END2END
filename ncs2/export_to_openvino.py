@@ -11,7 +11,7 @@ def main():
     parser.add_argument(
         "--onnx_path",
         type=str,
-        default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\openvino\output\efficientnet-lite0.onnx", # noqa E501
+        default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\openvino\output\efficientnet-lite0.onnx",  # noqa E501
     )
     parser.add_argument("--output_dir", type=str, default="output")
 
