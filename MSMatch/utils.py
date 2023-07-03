@@ -1,14 +1,11 @@
-import os, glob
-import time
-# from torch.utils.tensorboard import SummaryWriter
+import os
+import glob
 from efficientnet_pytorch import EfficientNet
 import efficientnet_lite_pytorch
 from efficientnet_lite0_pytorch_model import EfficientnetLite0ModelFile
-
 import logging
 import numpy as np
 from sklearn.metrics import confusion_matrix
-from random import sample
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -18,17 +15,26 @@ def get_classes_name(ssl_dataset):
     """
     Get class names.
     """
-    classes_names=sorted(glob.glob(os.path.join(ssl_dataset.data_dir,"*")))
+    classes_names = sorted(glob.glob(os.path.join(ssl_dataset.data_dir, "*")))
 
-    class_dir=[]
+    class_dir = []
     for c_name in classes_names:
         class_dir.append(c_name.split(os.path.sep)[-1])
-   
+
     return class_dir
 
 
-def plot_cmatrix(preds,labels,encoding, figsize=(8, 5),dpi=150, class_names_font_scale=1.2, matrix_font_size=12, save_fig_name=None):
-    """Plotting the confusion matrix for one or three dataset seeds. 
+def plot_cmatrix(
+    preds,
+    labels,
+    encoding,
+    figsize=(8, 5),
+    dpi=150,
+    class_names_font_scale=1.2,
+    matrix_font_size=12,
+    save_fig_name=None,
+):
+    """Plotting the confusion matrix for one or three dataset seeds.
 
     Args:
         preds ([numpy array]): array containing predictions for one or three dataset seeds.
@@ -44,28 +50,45 @@ def plot_cmatrix(preds,labels,encoding, figsize=(8, 5),dpi=150, class_names_font
         n = 0
         for preds_seed, labels_seed in zip(preds, labels):
             if n == 0:
-                cm = confusion_matrix(labels_seed,preds_seed,normalize='true')
-                n+=1
+                cm = confusion_matrix(labels_seed, preds_seed, normalize="true")
+                n += 1
             else:
-                cm+= confusion_matrix(labels_seed,preds_seed,normalize='true')
-        cm/=len(preds)
+                cm += confusion_matrix(labels_seed, preds_seed, normalize="true")
+        cm /= len(preds)
     else:
-        cm = confusion_matrix(labels,preds,normalize='true')
-        
-    cm=np.floor(cm*1000)/10
-    sn.set(font_scale=class_names_font_scale) # for label size
+        cm = confusion_matrix(labels, preds, normalize="true")
+
+    cm = np.floor(cm * 1000) / 10
+    sn.set(font_scale=class_names_font_scale)  # for label size
     plt.figure(figsize=figsize, dpi=dpi)
-    df_cm=pd.DataFrame(cm, index=[k for k in encoding], columns=[k for k in encoding])
-    labels=df_cm.applymap(lambda v: str(int(round(v))) if int(round(v)) > 0 else '')
-    sn.heatmap(df_cm, annot=labels, linewidths=.5, fmt='', annot_kws={'fontsize':matrix_font_size}) # font size
+    df_cm = pd.DataFrame(cm, index=[k for k in encoding], columns=[k for k in encoding])
+    labels = df_cm.applymap(lambda v: str(int(round(v))) if int(round(v)) > 0 else "")
+    sn.heatmap(
+        df_cm,
+        annot=labels,
+        linewidths=0.5,
+        fmt="",
+        annot_kws={"fontsize": matrix_font_size},
+    )  # font size
     if save_fig_name is not None:
         sn.set_theme()
         plt.tight_layout()
         plt.savefig(save_fig_name)
 
 
-def plot_examples(images,labels,encoding, figsize=(8, 5),dpi=150, labels_fontsize=5, prediction=None, save_fig_name=None):
-    """Plotting 32 randomly sampled image examples for a target dataset, ensuring that at least one image for each class is got. If `prediction` is given, both predicted and expected classes are shown for each image.
+def plot_examples(
+    images,
+    labels,
+    encoding,
+    figsize=(8, 5),
+    dpi=150,
+    labels_fontsize=5,
+    prediction=None,
+    save_fig_name=None,
+):
+    """Plotting 32 randomly sampled image examples for a target dataset,
+    ensuring that at least one image for each class is got. If `prediction` is given,
+    both predicted and expected classes are shown for each image.
 
     Args:
         images ([list]): list of images to plot.
@@ -77,53 +100,56 @@ def plot_examples(images,labels,encoding, figsize=(8, 5),dpi=150, labels_fontsiz
         prediction ([list], optional): List of predicted classes. Defaults to None.
         save_fig_name ([str], optional): output figure name. If 'None', no output figure is saved. Defaults to None.
     """
-    def sort_x_according_to_y(x,y):
-        return [x for _,x in sorted(zip(y,x))]
-    
-    fig = plt.figure(figsize=figsize, dpi=dpi)
-    
-    class_found=[]
-    shuffled_idx=list(np.random.permutation(len(labels)))
-    
-    labels=sort_x_according_to_y(labels, shuffled_idx)
-    images=sort_x_according_to_y(images, shuffled_idx)
-    if prediction is not None:
-        prediction=sort_x_according_to_y(prediction, shuffled_idx)
-        
-        
-    labels_idx=[]
-    class_found=[]
 
-    for l in range(len(labels)):
-        if not(labels[l] in class_found):
-            labels_idx.append(l)
-            class_found.append(labels[l])
-            
+    def sort_x_according_to_y(x, y):
+        return [x for _, x in sorted(zip(y, x))]
+
+    fig = plt.figure(figsize=figsize, dpi=dpi)
+
+    class_found = []
+    shuffled_idx = list(np.random.permutation(len(labels)))
+
+    labels = sort_x_according_to_y(labels, shuffled_idx)
+    images = sort_x_according_to_y(images, shuffled_idx)
+    if prediction is not None:
+        prediction = sort_x_according_to_y(prediction, shuffled_idx)
+
+    labels_idx = []
+    class_found = []
+
+    for k in range(len(labels)):
+        if not (labels[k] in class_found):
+            labels_idx.append(k)
+            class_found.append(labels[k])
+
     print("Number of different classes found:", len(class_found))
-            
-    n_to_add= 32 - len(labels_idx)
-            
-    for l in range(len(labels)):
+
+    n_to_add = 32 - len(labels_idx)
+
+    for k in range(len(labels)):
         if n_to_add == 0:
             break
-            
-        if not(l in labels_idx):
-            labels_idx.append(l)
-            n_to_add-=1
-            
-    
-    #rand_indices=sample(range(len(images)), 32)
+
+        if not (k in labels_idx):
+            labels_idx.append(k)
+            n_to_add -= 1
+
     for idx, rand_idx in enumerate(labels_idx):
         img = images[rand_idx]
-        ax = fig.add_subplot(4, 8, idx+1, xticks=[], yticks=[])
+        _ = fig.add_subplot(4, 8, idx + 1, xticks=[], yticks=[])
         if np.max(img) > 1.5:
             img = img / 255
         plt.imshow(img)
         if prediction is not None:
-            label = "GT: " + encoding[labels[rand_idx]] + "\n PR: " + encoding[prediction[rand_idx]]
+            label = (
+                "GT: "
+                + encoding[labels[rand_idx]]
+                + "\n PR: "
+                + encoding[prediction[rand_idx]]
+            )
         else:
-            label = encoding[labels[rand_idx]]    
-        plt.title(str(label),fontsize=labels_fontsize)
+            label = encoding[labels[rand_idx]]
+        plt.title(str(label), fontsize=labels_fontsize)
 
     if save_fig_name is not None:
         plt.savefig(save_fig_name)
@@ -201,11 +227,13 @@ def net_builder(
                 if net_name == "efficientnet-lite0":
                     print("Using pretrained", net_name, "...")
                     weights_path = EfficientnetLite0ModelFile.get_model_file_path()
-                    
 
                     return lambda num_classes, in_channels: efficientnet_lite_pytorch.EfficientNet.from_pretrained(
-                        'efficientnet-lite0', weights_path = weights_path,num_classes=num_classes, in_channels=in_channels
-                        )
+                        "efficientnet-lite0",
+                        weights_path=weights_path,
+                        num_classes=num_classes,
+                        in_channels=in_channels,
+                    )
                 else:
                     print("ERROR. Only efficientnet-lite0 pretrained is supported.")
                     print("Using not pretrained model", net_name, "...")
@@ -249,7 +277,7 @@ def get_logger(name, save_path=None, level="INFO"):
     streamHandler.setFormatter(log_format)
     logger.addHandler(streamHandler)
 
-    if not save_path is None:
+    if save_path is not None:
         os.makedirs(save_path, exist_ok=True)
         fileHandler = logging.FileHandler(os.path.join(save_path, "log.txt"))
         fileHandler.setFormatter(log_format)
@@ -374,11 +402,12 @@ def decode_parameters_from_path(filepath):
 def clean_results_df(
     original_df, data_folder_name, sort_criterion="net", keep_per_class=False
 ):
-    """Removing unnecessary columns to save into the csv file, sorting rows according to the sort_criterion, sorting colums according to the csv file format.
+    """Removing unnecessary columns to save into the csv file,
+    sorting rows according to the sort_criterion, sorting colums according to the csv file format.
 
     Args:
         original_df ([df]): original dataframe to clean.
-        data_folder_name ([str]): string containing experiment results
+        data_folder_name ([str]): string containing experiment results.
         sort_criterion (str, optional): Default criterion for rows sorting. Defaults to "net".
         keep_per_class (bool, optional): If True will not discard class-wise accuracy
 
@@ -399,8 +428,8 @@ def clean_results_df(
             axis=1,
         )
     else:
-        dataset_name=original_df.index[0]
-        
+        dataset_name = original_df.index[0]
+
         if dataset_name == "ucm":
             new_df = original_df.drop(
                 labels=[
@@ -413,7 +442,7 @@ def clean_results_df(
                     "baseballdiamond",
                     "beach",
                     "buildings",
-                    "chaparral", 
+                    "chaparral",
                     "denseresidential",
                     "forest",
                     "freeway",
@@ -435,7 +464,7 @@ def clean_results_df(
                 ],
                 axis=1,
             )
-            
+
         else:
             new_df = original_df.drop(
                 labels=[
@@ -458,7 +487,7 @@ def clean_results_df(
                     "data_dir",
                 ],
                 axis=1,
-            )    
+            )
 
     # Swap accuracy positions to sort it as in the final results file
     keys = new_df.columns.tolist()
@@ -483,4 +512,3 @@ def clean_results_df(
 
     # Returning new_df sorted by values according to the sort_criterion
     return new_df.sort_values(by=[sort_criterion], axis=0)
-

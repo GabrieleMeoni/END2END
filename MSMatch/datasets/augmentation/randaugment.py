@@ -5,15 +5,16 @@
 
 import random
 
-import PIL, PIL.ImageOps, PIL.ImageEnhance, PIL.ImageDraw
+import PIL
+import PIL.ImageOps
+import PIL.ImageEnhance
+import PIL.ImageDraw
 import albumentations as A
 import numpy as np
-import torch
-from PIL import Image
 
 try:  # to test locally by running python randaugment.py
     from .ms_augmentations import ms_augmentation_list
-except:
+except:  # noqa E722
     from ms_augmentations import ms_augmentation_list
 
 
@@ -152,7 +153,7 @@ def CutoutAbs(img, v):  # [0, 60] => percentage: [0, 0.2]
 
 
 def augment_list():
-    l = [
+    aug = [
         (AutoContrast, 0, 1),
         (Brightness, 0.05, 0.95),
         (Color, 0.05, 0.95),
@@ -168,7 +169,7 @@ def augment_list():
         (TranslateX, -0.3, 0.3),
         (TranslateY, -0.3, 0.3),
     ]
-    return l
+    return aug
 
 
 class RandAugment:
@@ -199,4 +200,3 @@ if __name__ == "__main__":
         val = min_val + float(max_val - min_val) * random.random()
         print(op)
         img = op(test_img, val)
-
