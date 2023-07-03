@@ -6,7 +6,7 @@ from utils import net_builder
 
 try:
     from onboard_prototype_utils import coarse_coregistration
-except: # noqa E722
+except:  # noqa E722
     raise ValueError("Impossible to find " "onboard_prototype_utils" ".")
 
 import torch
