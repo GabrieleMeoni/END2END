@@ -7,9 +7,7 @@ import torch
 from tqdm import tqdm
 import pandas as pd
 import random
-
 from copy import deepcopy
-import numpy as np
 
 
 def geographical_splitter(
@@ -20,7 +18,8 @@ def geographical_splitter(
     seed=42,
     split_percentage_error_tolerance=0.01,
 ):
-    """Splits the events according to a geographical position. In this way, patches related to a specific area can be only in train or validation.
+    """Splits the events according to a geographical position.
+    In this way, patches related to a specific area can be only in train or validation.
 
     Args:
         images (np.array): list of images to split.
@@ -37,7 +36,7 @@ def geographical_splitter(
         np.array: test labels
     """
     # Not events dictionaries
-    ##Fire not_event: locations - n_events dictionary
+    # --- Fire not_event: locations - n_events dictionary
     fire_not_events_locations_dict = {
         "Bolivia": 189,
         "France": 32,
@@ -51,7 +50,7 @@ def geographical_splitter(
         "Sweden": 105,
     }
 
-    ## Volcanoes not_event: locations - n_events dictionary
+    # --- Volcanoes not_event: locations - n_events dictionary
     volcano_not_events_locations_dict = {
         "Barren_Island": 160,
         "Chillan_Nevados_de": 80,
@@ -73,7 +72,7 @@ def geographical_splitter(
     }
 
     # Events dictionaries
-    ## Fire event: locations - n_events dictionary
+    # --- Fire event: locations - n_events dictionary
     fire_events_locations_dict = {
         "Bolivia": 18,
         "France": 15,
@@ -87,7 +86,7 @@ def geographical_splitter(
         "Ukraine": 14,
     }
 
-    ## Volcanoes event: locations - n_events dictionary
+    # --- Volcanoes event: locations - n_events dictionary
     volcano_events_locations_dict = {
         "Barren_Island": 8,
         "Chillan_Nevados_de": 4,

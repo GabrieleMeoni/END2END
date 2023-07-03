@@ -6,7 +6,6 @@ from sklearn import preprocessing
 import torch
 from tqdm import tqdm
 import pandas as pd
-import numpy as np
 
 
 class THRAWS_test_dataset(torch.utils.data.Dataset):

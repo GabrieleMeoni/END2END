@@ -3,9 +3,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 import torch.nn.functional as F
 from fastai.metrics import MatthewsCorrCoef
-
 import math
-import time
 import os
 
 
@@ -204,7 +202,8 @@ def ce_loss(logits, targets, weight=None, use_hard_labels=True, reduction="none"
         logits: logit values, shape=[Batch size, # of classes]
         targets: integer or vector, shape=[Batch size] or [Batch size, # of classes]
         weight: weights for loss if hard labels are used.
-        use_hard_labels: If True, targets have [Batch size] shape with int values. If False, the target is vector (default True)
+        use_hard_labels: If True, targets have [Batch size] shape with int values.
+                         If False, the target is vector. Default to True.
     """
     if use_hard_labels:
         if weight is not None:

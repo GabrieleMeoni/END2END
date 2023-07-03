@@ -1,14 +1,9 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as models
 from torch.cuda.amp import autocast, GradScaler
-
 import os
 import contextlib
 from tqdm import tqdm
-from train_utils import AverageMeter
-
 from .fixmatch_utils import consistency_loss, Get_Scalar
 from train_utils import ce_loss, accuracy, mcc
 
@@ -261,7 +256,7 @@ class FixMatch:
                             best_eval_acc = tb_dict["eval/top-1-acc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}"
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}" # noqa E501
                         )
                     else:
                         if tb_dict["eval/top-1-acc"] > best_eval_acc:
@@ -272,7 +267,7 @@ class FixMatch:
                             best_eval_mcc = tb_dict["eval/mcc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}"
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}" # noqa E501
                         )
 
                     progressbar = tqdm(
@@ -286,7 +281,7 @@ class FixMatch:
                     if self.it == best_it:
                         self.save_model("model_best.pth", save_path)
 
-                    if not self.tb_log is None:
+                    if self.tb_log is not None:
                         self.tb_log.update(tb_dict, self.it)
 
                 self.it += 1
@@ -376,7 +371,7 @@ class FixMatch:
                             best_eval_acc = tb_dict["eval/top-1-acc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}"
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_MCC: {best_eval_mcc}, at {best_it} iters, BEST_EVAL_ACC: {best_eval_acc}" # noqa E501
                         )
                     else:
                         if tb_dict["eval/top-1-acc"] > best_eval_acc:
@@ -387,7 +382,7 @@ class FixMatch:
                             best_eval_mcc = tb_dict["eval/mcc"]
 
                         self.print_fn(
-                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}"
+                            f"{self.it} iteration, USE_EMA: {hasattr(self, 'eval_model')}, {tb_dict}, BEST_EVAL_ACC: {best_eval_acc}, at {best_it} iters, BEST_EVAL_MCC: {best_eval_mcc}" # noqa E501
                         )
 
                     progressbar = tqdm(
@@ -401,7 +396,7 @@ class FixMatch:
                     if self.it == best_it:
                         self.save_model("model_best.pth", save_path)
 
-                    if not self.tb_log is None:
+                    if self.tb_log is not None:
                         self.tb_log.update(tb_dict, self.it)
 
                 self.it += 1

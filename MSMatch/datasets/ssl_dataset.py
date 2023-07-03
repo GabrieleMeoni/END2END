@@ -1,9 +1,4 @@
-import numpy as np
-
 import torch
-from torch.utils.data import Dataset, DataLoader
-from torch.utils.data.sampler import BatchSampler
-
 from .data_utils import split_ssl_data
 from .dataset import BasicDataset
 from .thraws_train_dataset import THRAWS_train_dataset
@@ -11,33 +6,11 @@ from .thraws_test_dataset import THRAWS_test_dataset
 
 
 import torchvision
-from torchvision import datasets, transforms
+from torchvision import transforms
 
 mean, std = {}, {}
 mean["cifar10"] = [x / 255 for x in [125.3, 123.0, 113.9]]
 mean["cifar100"] = [x / 255 for x in [129.3, 124.1, 112.4]]
-mean["ucm"] = [x / 255 for x in [123.58113728, 125.08415423, 115.0754208]]
-mean["aid"] = [x / 255 for x in [100.40901229, 103.34463381, 92.92875687]]
-mean["eurosat_rgb"] = [x / 255 for x in [87.78644464, 96.96653968, 103.99007906]]
-mean["eurosat_ms"] = [
-    x / 255
-    for x in [
-        91.94472713,
-        74.57486138,
-        67.39810048,
-        58.46731632,
-        72.24985416,
-        114.44099918,
-        134.4489474,
-        129.75758655,
-        41.61089189,
-        0.86983654,
-        101.75149263,
-        62.3835689,
-        145.87144681,
-    ]
-]
-
 mean["thraws_swir_train"] = [0, 0, 0]  # zero mean
 mean["thraws_swir_test"] = [0, 0, 0]  # zero mean
 # std['thraws_swir']=[(2**8)-1,(2**8)-1,(2**8)-1] # 8 bit sampling
@@ -112,9 +85,6 @@ class SSL_Dataset:
         self.upsample_notevent = upsample_notevent
         self.eval_split_ratio = eval_split_ratio
         self.use_ms_augmentations = False
-        # need to use different augmentations for multispectral
-        if self.name == "eurosat_ms":
-            self.use_ms_augmentations = True
 
     def get_data(self):
         """
@@ -207,10 +177,10 @@ class SSL_Dataset:
 
         data, targets = self.get_data()
 
-        num_classes = self.num_classes
-        transform = self.transform
+        _ = self.num_classes
+        _ = self.transform
 
-        lb_data, lb_targets, ulb_data, ulb_targets = split_ssl_data(
+        lb_data, lb_targets, _, _ = split_ssl_data(
             data, targets, num_labels, self.num_classes, index, include_lb_to_ulb
         )
 

@@ -1,6 +1,4 @@
 import torch
-import torchvision
-from torchvision import datasets
 from torch.utils.data import sampler, DataLoader
 from torch.utils.data.sampler import BatchSampler
 import torch.distributed as dist
@@ -38,7 +36,7 @@ def sample_labeled_data(data, target, num_labels, num_classes, index=None):
     (sampling with balanced ratio over classes)
     """
     assert num_labels % num_classes == 0
-    if not index is None:
+    if index is not None:
         index = np.array(index, dtype=np.int32)
         return data[index], target[index], index
 

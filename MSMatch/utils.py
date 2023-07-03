@@ -1,15 +1,11 @@
-import os, glob
-import time
-
-# from torch.utils.tensorboard import SummaryWriter
+import os
+import glob
 from efficientnet_pytorch import EfficientNet
 import efficientnet_lite_pytorch
 from efficientnet_lite0_pytorch_model import EfficientnetLite0ModelFile
-
 import logging
 import numpy as np
 from sklearn.metrics import confusion_matrix
-from random import sample
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -90,7 +86,9 @@ def plot_examples(
     prediction=None,
     save_fig_name=None,
 ):
-    """Plotting 32 randomly sampled image examples for a target dataset, ensuring that at least one image for each class is got. If `prediction` is given, both predicted and expected classes are shown for each image.
+    """Plotting 32 randomly sampled image examples for a target dataset,
+    ensuring that at least one image for each class is got. If `prediction` is given,
+    both predicted and expected classes are shown for each image.
 
     Args:
         images ([list]): list of images to plot.
@@ -119,27 +117,26 @@ def plot_examples(
     labels_idx = []
     class_found = []
 
-    for l in range(len(labels)):
-        if not (labels[l] in class_found):
-            labels_idx.append(l)
-            class_found.append(labels[l])
+    for k in range(len(labels)):
+        if not (labels[k] in class_found):
+            labels_idx.append(k)
+            class_found.append(labels[k])
 
     print("Number of different classes found:", len(class_found))
 
     n_to_add = 32 - len(labels_idx)
 
-    for l in range(len(labels)):
+    for k in range(len(labels)):
         if n_to_add == 0:
             break
 
-        if not (l in labels_idx):
-            labels_idx.append(l)
+        if not (k in labels_idx):
+            labels_idx.append(k)
             n_to_add -= 1
 
-    # rand_indices=sample(range(len(images)), 32)
     for idx, rand_idx in enumerate(labels_idx):
         img = images[rand_idx]
-        ax = fig.add_subplot(4, 8, idx + 1, xticks=[], yticks=[])
+        _ = fig.add_subplot(4, 8, idx + 1, xticks=[], yticks=[])
         if np.max(img) > 1.5:
             img = img / 255
         plt.imshow(img)
@@ -280,7 +277,7 @@ def get_logger(name, save_path=None, level="INFO"):
     streamHandler.setFormatter(log_format)
     logger.addHandler(streamHandler)
 
-    if not save_path is None:
+    if save_path is not None:
         os.makedirs(save_path, exist_ok=True)
         fileHandler = logging.FileHandler(os.path.join(save_path, "log.txt"))
         fileHandler.setFormatter(log_format)
@@ -405,11 +402,12 @@ def decode_parameters_from_path(filepath):
 def clean_results_df(
     original_df, data_folder_name, sort_criterion="net", keep_per_class=False
 ):
-    """Removing unnecessary columns to save into the csv file, sorting rows according to the sort_criterion, sorting colums according to the csv file format.
+    """Removing unnecessary columns to save into the csv file,
+    sorting rows according to the sort_criterion, sorting colums according to the csv file format.
 
     Args:
         original_df ([df]): original dataframe to clean.
-        data_folder_name ([str]): string containing experiment results
+        data_folder_name ([str]): string containing experiment results.
         sort_criterion (str, optional): Default criterion for rows sorting. Defaults to "net".
         keep_per_class (bool, optional): If True will not discard class-wise accuracy
 

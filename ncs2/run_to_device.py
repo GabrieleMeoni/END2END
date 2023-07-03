@@ -78,7 +78,7 @@ def main():
     compiled_model = ie_core.compile_model(model=model, device_name=args.device)
 
     # Get the input and output nodes.
-    input_layer = compiled_model.input(0)
+    _ = compiled_model.input(0)
     output_layer = compiled_model.output(0)
 
     # Preparing placeholders for targets and predictions and preparing data for the inference.

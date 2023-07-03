@@ -15,7 +15,7 @@ def main():
     parser.add_argument(
         "--load_path",
         type=str,
-        default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\MSMatch\checkpoint\thraws_swir_train\FixMatch_archefficientnet-lite0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels800_optSGD\model_best.pth",
+        default="model_best.pth",
     )
     parser.add_argument("--output_dir", type=str, default="output")
     parser.add_argument("--test_dataset", type=str, default="thraws_swir_test")

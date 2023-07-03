@@ -1,5 +1,3 @@
-from torchvision import transforms
-
 import albumentations as A
 
 from imgaug import augmenters as iaaa
@@ -63,7 +61,7 @@ def TranslateY(img, v):
 
 
 def ms_augmentation_list():
-    l = [
+    aug = [
         # The below four don't work with multispectral images
         # (AutoContrast, 0, 1),
         # (Brightness, 0.05, 0.95),
@@ -80,4 +78,4 @@ def ms_augmentation_list():
         (TranslateX, -0.3, 0.3),
         (TranslateY, -0.3, 0.3),
     ]
-    return l
+    return aug
