@@ -1,6 +1,4 @@
 import torch
-import torchvision
-from torchvision import datasets
 from torch.utils.data import sampler, DataLoader
 from torch.utils.data.sampler import BatchSampler
 import torch.distributed as dist
@@ -14,7 +12,7 @@ def split_ssl_data(
 ):
     """
     data & target is splitted into labeled and unlabeld data.
-    
+
     Args
         index: If np.array of index is given, select the data[index], target[index] as labeled samples.
         include_lb_to_ulb: If True, labeled data is also included in unlabeld data
@@ -38,7 +36,7 @@ def sample_labeled_data(data, target, num_labels, num_classes, index=None):
     (sampling with balanced ratio over classes)
     """
     assert num_labels % num_classes == 0
-    if not index is None:
+    if index is not None:
         index = np.array(index, dtype=np.int32)
         return data[index], target[index], index
 
@@ -95,9 +93,9 @@ def get_data_loader(
     get_data_loader returns torch.utils.data.DataLoader for a Dataset.
     All arguments are comparable with those of pytorch DataLoader.
     However, if distributed, DistributedProxySampler, which is a wrapper of data_sampler, is used.
-    
+
     Args
-        num_epochs: total batch -> (# of batches in dset) * num_epochs 
+        num_epochs: total batch -> (# of batches in dset) * num_epochs
         num_iters: total batch -> num_iters
     """
 
@@ -136,7 +134,7 @@ def get_data_loader(
 
         if distributed:
             """
-            Different with DistributedSampler, 
+            Different with DistributedSampler,
             the DistribuedProxySampler does not shuffle the data (just wrapper for dist).
             """
             data_sampler = DistributedProxySampler(data_sampler)
