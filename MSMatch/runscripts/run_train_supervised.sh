@@ -1,9 +1,9 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=6
+export CUDA_VISIBLE_DEVICES=4
 DEVICE=0
 FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
 SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
-SAVE_DIR="paper_train_msmatch"                              
+SAVE_DIR="final_train_supervised"                             
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
 TEST_DATASET="thraws_swir_test"  
@@ -14,7 +14,7 @@ EVAL_SPLIT_RATIO=0.1 #Evaluation split percentage over the whole train/eval data
 N_EPOCH=70                    #Set NUM_TRAIN_ITER = N_EPOCH * NUM_EVAL_ITER * 32 / BATCH_SIZE
 NUM_EVAL_ITER=1000             #Number of iterations 
 NUM_TRAIN_ITER=$(($N_EPOCH * $NUM_EVAL_ITER * 32/ $BATCH_SIZE))
-SEED=9
+SEED=18
 WEIGHT_DECAY=0.00075
 LR=0.03
 RED='\033[0;31m'
@@ -23,7 +23,8 @@ URL_DIST="tcp://127.0.0.1:10007" #change port to avoid conflicts to allow multip
 USE_MCC_FOR_BEST="--use_mcc_for_best" # Leave empty to select best model depending on accuracy. Use use_mcc_for_best to select it depending on the mcc metric.
 #create save location
 mkdir -p $SAVE_LOCATION
-SUPERVISED=""
+SUPERVISED=--supervised
+
 
 #Upsampling values.
 TRAIN_UPS_NOTEVENT=1
@@ -31,13 +32,14 @@ EVAL_UPS_EVENT=1
 EVAL_UPS_NOTEVENT=1
 EVAL_BATCH_SIZE=64
 P_CUTOFF=0.95
+
 NUM_LABELS_USED="800"
-SAVE_DIR=$SAVE_DIR/"Seed_"/$SEED
+SAVE_DIR=$SAVE_DIR/"Seed_"$SEED
 #switch to fixmatch folder for execution
 cd $FIXMATCH_FOLDER
 for ups_event_eval in 1
 	do
-	for ups_event_train in 2 #3 4 6 7
+	for ups_event_train in 2 3 4 6 7
 		do
 		echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 		TRAIN_UPS_EVENT=$ups_event_train
@@ -46,8 +48,7 @@ for ups_event_eval in 1
 		echo -e "Upsampling events: TRAIN=${RED}$TRAIN_UPS_EVENT EVAL=$EVAL_UPS_EVENT ${BLACK}."
 		WEIGHT_E=$(bc -l <<< "4636 / $ups_event_train / 5033")
 		WEIGHT_NE=$(bc -l <<< "397 * $ups_event_train / 5033" )
-		LOSS_WEIGHT="[0${WEIGHT_E},0${WEIGHT_NE}]"
-
+		LOSS_WEIGHT="[0${WEIGHT_NE},0${WEIGHT_E}]"
 
 		if [[ ${#CUDA_VISIBLE_DEVICES} > 1 ]]
 		then

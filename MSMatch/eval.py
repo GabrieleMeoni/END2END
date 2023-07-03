@@ -110,7 +110,8 @@ if __name__ == "__main__":
         
         class_names=sorted(get_classes_name(_eval_dset))
         c_m = confusion_matrix(y_true, y_pred)
-        
+        print(class_names)
+        print(c_m)
         c_m_names=pd.DataFrame(c_m, columns=class_names,index=class_names)
 
         class_dict={i : class_names[i] for i in range(len(c_m_names))}

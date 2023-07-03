@@ -117,8 +117,10 @@ class SSL_Dataset:
             dset = dset(self.data_dir, train=self.train, download=True)
         elif self.name == "thraws_swir_train":
             dset = THRAWS_train_dataset(train=self.train, root_dir=self.data_dir, seed=self.seed, eval_split_ratio=self.eval_split_ratio, upsample_ratio=[self.upsample_notevent, self.upsample_event])
+
         elif self.name == "thraws_swir_test":
             dset = THRAWS_test_dataset(root_dir=self.data_dir)
+            self.data_dir=dset.root_dir
         
 
         if self.name == "cifar10":

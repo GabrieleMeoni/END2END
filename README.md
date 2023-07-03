@@ -1,7 +1,26 @@
 # END2END
-End2end training on S2 raw data
-## About the project 
-This project investigates the training on Sentinel-2 RAW data. 
+### END2END: End2end training on S-2 RAW data
+# About the project 
+
+## 🛰️ END2END: Onboard Detection of Thermal Anomalies from Raw Sentinel-2 Data
+
+The "end2end" package is a comprehensive Python library designed specifically for detecting and analyzing thermal anomalies in Sentinel-2 data onboard. It provides a complete codebase that enables users to replicate experiments, train and test an efficientnet-b0-lite architecture for the identification of thermal anomalies.
+
+## 🌍🧑‍🔬 Key Features:
+
+- Sentinel-2 RAW Data Integration: The "end2end" package seamlessly integrates with Sentinel-2 data, allowing users to access and preprocess the necessary satellite imagery for thermal anomaly detection.
+Efficientnet-b0-lite Architecture: The package utilizes the efficientnet-b0-lite convolutional neural network (CNN) architecture, a lightweight variant of the efficientnet models. This architecture is specifically tailored for efficient processing and analysis of large-scale satellite imagery.
+- Thermal Anomaly Detection: The core functionality of the "end2end" package revolves around training and testing the efficientnet-b0-lite architecture to identify thermal anomalies within the Sentinel-2 data. It employs deep learning techniques to automatically learn the distinguishing features of anomalies and provide accurate detection results.
+- Experiment Replication: Users can reproduce the experiments conducted by the package's developers by utilizing the provided codebase. This ensures transparency and enables researchers to compare their results with the established benchmarks.
+- Data Preprocessing and Augmentation: The package incorporates various data preprocessing techniques to enhance the quality and usability of Sentinel-2 data. Additionally, it includes data augmentation methods to increase the diversity and robustness of the training dataset.
+- Visualization and Analysis: "end2end" includes visualization tools to display and analyze the detected thermal anomalies. These visualizations can help users gain insights into the spatial and temporal distribution of anomalies, facilitating further analysis and decision-making processes.
+
+## 📈📊 Applications:
+In a nutshell 🌰, the "end2end" package provides a powerful and user-friendly framework for detecting thermal anomalies in Sentinel-2 data onboard. By leveraging the efficientnet-b0-lite architecture, it enables efficient and accurate identification of anomalies, making it a valuable resource for researchers, environmental agencies, and other stakeholders involved in satellite-based anomaly detection and monitoring.
+
+## 🚀👨‍🚀 Easy Reproduction and Quick Adoption
+
+END2END provides the source code of MSMatch online to enable easy reproduction and quick adoption. It hendles well to multispectral raw data and should enable various applications that are currently infeasible.
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -25,7 +44,7 @@ This project investigates the training on Sentinel-2 RAW data.
 ### Pre-requirements
 Before all, clone this repository. We suggest using git from CLI, execute:
 
-``` git clone https://gitlab.esa.int/Alix.DeBeusscher/PyRawS.git ```
+``` git clone https://github.com/ESA-PhiLab/PyRawS ```
 
 ### Create the end2end environment
 To install the environment, we suggest to use [anaconda]("https://www.anaconda.com/products/distribution"). You can create a dedicated conda environment by using the `environment.yml` file by running the following command from the main directory: 
@@ -89,5 +108,5 @@ Distributed under the GPL-3.0 License.
 ## Contact
 Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/).
 
-* Gabriele Meoni - gabriele.meoni at esa.int
+* Gabriele Meoni - Currently with TU Delft: G.Meoni@tudelft.nl
 * Roberto Del Prete - roberto.delprete at ext.esa.int

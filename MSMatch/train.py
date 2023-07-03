@@ -130,10 +130,24 @@ def main_worker(gpu, ngpus_per_node, args):
     train_dset = SSL_Dataset(
         name=args.dataset, train=True, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio,upsample_event=args.train_upsample_event,upsample_notevent=args.train_upsample_notevent,
     )
-    lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
+    if args.supervised:
+        lb_dset = train_dset.get_dset()
+        ulb_dset = None
+    else:
+        lb_dset, ulb_dset = train_dset.get_ssl_dset(args.num_labels)
 
     args.num_classes = train_dset.num_classes
     args.num_channels = train_dset.num_channels
+
+    if args.loss_weight is None:
+        loss_weight = torch.tensor([1.0 for n in range(len(train_dset.num_classes))])
+    else:
+        loss_weight=torch.tensor([float(args.loss_weight[1:-1].split(",")[0]), float(args.loss_weight[1:-1].split(",")[1])])
+
+    if torch.cuda.is_available():
+        loss_weight=loss_weight.cuda()
+    
+    args.loss_weight=loss_weight
 
     _eval_dset = SSL_Dataset(
         name=args.dataset, train=False, data_dir=args.data_dir, seed=args.seed, eval_split_ratio=args.eval_split_ratio, upsample_event=args.eval_upsample_event,upsample_notevent=args.eval_upsample_notevent,
@@ -352,6 +366,13 @@ if __name__ == "__main__":
         type=int,
         default=1024,
         help="batch size of evaluation data loader (it does not affect the accuracy)",
+    )
+    parser.add_argument(
+        "--supervised", action="store_true", help="if used, supervised training will be performed."
+    )
+
+    parser.add_argument(
+        "--loss_weight", default=None, help="Weights for loss. If None, all 1s will be used."
     )
 
     parser.add_argument("--hard_label", type=bool, default=True)
