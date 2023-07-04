@@ -64,9 +64,9 @@ Before all, clone this repository. We suggest using git from CLI, execute:
 ``` git clone https://github.com/ESA-PhiLab/PyRawS ```
 
 ### Create the end2end environment
-To install the environment, we suggest to use [anaconda]("https://www.anaconda.com/products/distribution"). You can create a dedicated conda environment by using the `environment.yml` file by running the following command from the main directory: 
+To install the environment, we suggest to use [anaconda]("https://www.anaconda.com/products/distribution"). You can create a dedicated conda environment by running the following command from the main directory: 
 
-``` conda env create -f environment.yml ```
+``` source install.sh ```
 
 To activate your environment, please execute:
 
