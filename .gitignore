@@ -6,6 +6,7 @@
 *.onnx
 *.pth
 *.txt
+!requirements.txt
 MSMatch/*.csv
 MSMatch/*.png
 MSMatch/checkpoints/iter1/thraws_swir/FixMatch_archefficientnet-b0_batch8_confidence0.95_lr0.03_uratio4_wd0.00075_wu1.0_seed0_numlabels600_optSGD/model_best.pth
