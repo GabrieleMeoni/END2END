@@ -5,7 +5,7 @@ sys.path.insert(1, os.path.join("..", "onboard_prototype"))
 import torch
 import argparse
 from termcolor import colored
-from onboard_detector_processor import oboardDetectorProcessor
+from onboard_detector_processor import onboardDetectorProcessor
 from onboard_prototype_utils import load_data
 
 
@@ -74,7 +74,7 @@ def main():
     dummy_input = granules_numbers[granules_numbers_list[0]]
 
     # Load onboard processor detector
-    onboard_processor = oboardDetectorProcessor(
+    onboard_processor = onboardDetectorProcessor(
         args.satellite,
         args.detector_number,
         model_name=args.model,
