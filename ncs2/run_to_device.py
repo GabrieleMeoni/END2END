@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.insert(1, os.path.join("..", "..", "MSMatch"))
+sys.path.insert(1, os.path.join("..", "MSMatch"))
 import time
 import torch
 import argparse

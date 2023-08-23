@@ -1,6 +1,6 @@
 # END2END
 ### END2END: End2end training on S-2 RAW data
-# About the project 
+# About the project
 
 ## 🛰️ END2END: Onboard classification of Thermal Anomalies on Raw Sentinel-2 Data
 
@@ -10,7 +10,7 @@ It provides a complete codebase that enables users to replicate experiments, tra
 
 ## 🚀👨‍🚀 Easy Reproduction and Quick Adoption
 
-END2END is based on the source code of [MSMatch](https://github.com/gomezzz/MSMatch), which was appropriately retailored for our purposes. Indeed, to train the EfficientNet-lite-0 models both semi-supervised and fully-supervised learning where investigated. 
+END2END is based on the source code of [MSMatch](https://github.com/gomezzz/MSMatch), which was appropriately retailored for our purposes. Indeed, to train the EfficientNet-lite-0 models both semi-supervised and fully-supervised learning where investigated.
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -39,20 +39,20 @@ END2END is based on the source code of [MSMatch](https://github.com/gomezzz/MSMa
   </ol>
 </details>
 
-## Content of the Repository 
+## Content of the Repository
 The END2END reportyory includes the following directories:
 
-- **MSMatch**: it contains the algorithms and the scripts used for training the model. As previously specified, the model was trained by leveraging the [MSMatch](https://github.com/gomezzz/MSMatch) appopriately modified to perform both supevised-learning and semi-supervised learning on our dataset. In particular, it contains the following subdirectories: 
+- **MSMatch**: it contains the algorithms and the scripts used for training the model. As previously specified, the model was trained by leveraging the [MSMatch](https://github.com/gomezzz/MSMatch) appopriately modified to perform both supevised-learning and semi-supervised learning on our dataset. In particular, it contains the following subdirectories:
 
 1. `datasets`: it contains the description of the datasets used for our work plus other files inherited from the original MSMatch repository. The files of interests are `thraws_train_dataset.py` (patch classification train and cross_validation splits) and  `thraws_test_dataset.py` (patch classification test split). For more information, on how to set-up the training pipeline, please check [Set-up for the training pipeline](set-up-for-the-embedded-hardware-implementation).
 
-2. `models`: contains the description of the AI models used for training and the `fixmatch` pipeline on which the original MSMatch pipeline is based. 
+2. `models`: contains the description of the AI models used for training and the `fixmatch` pipeline on which the original MSMatch pipeline is based.
 
-3. `notebooks`: it contains various useful notebooks. In particular, you can use `parse_results.ipynb` to extracts the results from the trained models. 
+3. `notebooks`: it contains various useful notebooks. In particular, you can use `parse_results.ipynb` to extracts the results from the trained models.
 
 4. `runscripts`: it contains the scripts used to run the training and evaluation. In particular, `run_train.sh` runs the training by using semi-supervised learning. To do that, part of the training split is used as unsupervised data.  `run_train_supervised.sh` disables the unsupervised loss in MSMatch by running supervised-training only by the entire training dataset as labelled data. Finally, `run_eval.py` permits evaluating a single model on the test dataset.
 
-- **ncs2**: it contains the files to implement a model on the [Intel® Neural Compute Stick 2](https://www.intel.com/content/www/us/en/developer/articles/tool/neural-compute-stick.html). Please, refer to (Set-up for the embedded hardware implementation)[#set-up-for-the-embedded-hardware-implementation] to know how to set-up the environment to use the NCS2. 
+- **ncs2**: it contains the files to implement a model on the [Intel® Neural Compute Stick 2](https://www.intel.com/content/www/us/en/developer/articles/tool/neural-compute-stick.html). Please, refer to (Set-up for the embedded hardware implementation)[#set-up-for-the-embedded-hardware-implementation] to know how to set-up the environment to use the NCS2.
 - **onboard prototype**: it contains the utils to implement the [Onboard payload prototype](#onboard-payload-prototype).
 - **resources**: it contains various resources for the END2END repositories (e.g., images).
 
@@ -64,7 +64,7 @@ Before all, clone this repository. We suggest using git from CLI, execute:
 ``` git clone https://github.com/ESA-PhiLab/PyRawS ```
 
 ### Create the end2end environment
-To install the environment, we suggest to use [anaconda]("https://www.anaconda.com/products/distribution"). You can create a dedicated conda environment by using the `environment.yml` file by running the following command from the main directory: 
+To install the environment, we suggest to use [anaconda]("https://www.anaconda.com/products/distribution"). You can create a dedicated conda environment by using the `environment.yml` file by running the following command from the main directory:
 
 ``` conda env create -f environment.yml ```
 
@@ -81,48 +81,57 @@ To set-up the MSMatch pipeline, please, proceed as follows:
 
 3. If you want to use `supervised learning` open the `run_train_supervised.sh` script, which is located in `MSMatch\runscripts`. Then, proceed as follows:
 
-* If you want to use GPUs, set-up the `CUDA_VISIBLE_DEVICES` with the number of GPU used. 
+* If you want to use GPUs, set-up the `CUDA_VISIBLE_DEVICES` with the number of GPU used.
 * Adjust the `FIXMATCH_FOLDER` variable with the absolute path of the `MSMatch` folder.
-* Adjust the `SAVE_LOCATION` variable with the absolute path to the whole training results. 
+* Adjust the `SAVE_LOCATION` variable with the absolute path to the whole training results.
 * Adjust `SAVE_DIR` with the name of the current experiment to contain the results of the training. For instance, if `SAVE_LOCATION="/home/my_home/END2END/checkpoints` and `SAVE_DIR=current_experiment`, the next training will be saved into `/home/my_home/END2END/checkpoints/current_experiment`.
 * Adjust `SEED` to set-up the seed used to perform geographical-splitting of the training set. Please, refer to [modifications of the original MSMatch pipeline](#modifications-of-the-original-msmatch-pipeline).
 
 If you want to use `semi-supervised learning` (based on `FixMatch` as in the original MSMatch implementation), open the `run_train.sh` script and proceed as above.  For both the scripts, the other variables are specific training hyper-parameters that you should not edit, if you want to reproduce our results.
 
-To launch the training, from `runscripts` launch one of the following commands: 
+To launch the training, from `runscripts` launch one of the following commands:
 
 ```source run_train.sh``` or ```source run_train_supervised.sh```
 
 
 ### Set-up for the embedded hardware implementation
 We have implemented a prototype on the [Intel Neural Compute Stick 2 (NCS2)](https://www.intel.com/content/www/us/en/developer/articles/tool/neural-compute-stick.html). <br>
-If you also want to use the files in the `ncs2` directory, you need to install [OPENVINOv 2022.1](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/download.html). We proceeded as follow to install successfully the software needed to interface the NCS2 device on Windows: 
+If you also want to use the files in the `ncs2` directory, you need to install [OPENVINOv 2022.1](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/download.html). We proceeded as follow to install successfully the software needed to interface the NCS2 device on Windows:
 
 1. Select version 2022.1 and download the offline installer.
 2. Install openvino through the downloaded offline installer. By default, it should produce the a directory called "Intel".
-3. Install openvino in the `end2end` conda environment through: 
+3. Install openvino in the `end2end` conda environment through:
 
 ```pip install openvino==2022.1````
 
-4. Install numpy==1.23.4 in the conda environment. 
+4. Install numpy==1.23.4 in the conda environment.
 
-5. Copy the content of `Intel\openvino_2022.1.0.643\runtime\bin\intel64\Release` into your 
+5. Copy the content of `Intel\openvino_2022.1.0.643\runtime\bin\intel64\Release` into your
    `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs`
 
-6. Export `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs` to PATH 
+6. Export `$CONDA_PATH\envs\end2end\Lib\site-packages\openvino\libs` to PATH
 
-Now, you should be able to work with the NCS2 device. 
+7. It is necessary to install `openvino-dev` that is necessary to export models to openvino IR format. To this aim, we use python virtual env to avoid conflicts. Please, proceed as follows:
+
+* Navigate to the `ncs2` directory.
+* Crete a virtual environment called `openvino_env` through: ```python -m env openvino_env```
+* Activate the virtual environment through: ```openvino_env\Scripts\activate```
+* Install `openvino-dev` through: ```pip install openvino-dev```
+
+Now, you should be able to work with the NCS2 device.
+
+Everytime you need to use ```export_to_openvino.py```, remember to activate the virtual environment.
 
 ## END2END datasets
 The dataset used for END2END is based on [THRawS](https://arxiv.org/abs/2305.11891). `THRawS` (Thermal Hotspots on Raw Sentinel-2 data) is a Sentinel-2 dataset containing raw granules including annotated thermal anomalies. <br>
-In particular: 
+In particular:
 - to train the model, the bands [`B8A`, `B11`, `B12`] of the various granules of `THRawS` was preprocessed to extract 256x256 patches for thermal anomalies classification. To this aim, `ROBERTO TO COMPLETE`.
-The patch classification dataset can be downloaded from [here (temporary)](https://drive.google.com/drive/folders/1Fa6-3_mW7-4V_gMIehxq0qU4Epn3WxyB?usp=drive_link). **N.B.** you might need to request access. 
+The patch classification dataset can be downloaded from [here (temporary)](https://drive.google.com/drive/folders/1Fa6-3_mW7-4V_gMIehxq0qU4Epn3WxyB?usp=drive_link). **N.B.** you might need to request access.
 
 - for the [onboard payload prototype](#onboard-payload-prototype), the bands [`B8A`, `B11`, `B12`] of [Sentinel-2 Raw granules](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-granule) are grouped in a [TIF](https://en.wikipedia.org/wiki/TIFF) file, representing an easy-to-read version of the THRawS granules without metadata.
 
 ## Modifications of the original MSMatch pipeline
-The modifications of the original MSMAtch pipeline include: 
+The modifications of the original MSMAtch pipeline include:
 
 - Addition of variable upsampling of the strongly unbalanced `event` class. The upsampling factor is specified in the `run_train.sh`/`run_train_supervised.sh` scripts (i.e., `TRAIN_UPS_EVENT`).
 
@@ -132,8 +141,8 @@ The modifications of the original MSMAtch pipeline include:
 
 - No channel-based normalization of data.
 
-## Workflow to implement a trained model on the edge device 
-Once you have trained your model, you can implement the trained model on the edge device as follows: 
+## Workflow to implement a trained model on the edge device
+Once you have trained your model, you can implement the trained model on the edge device as follows:
 <p align="center">
   <img src="resources/images/ncs2WorkFlow.drawio.png" alt="Sublime's custom image"/>
 </p>
@@ -144,7 +153,7 @@ Once you have trained your model, you can implement the trained model on the edg
 </p>
 
 In the frame of the END2END project, we aim to implement a mock-up of a full on-board payload processing chain from the sensor to the classification with minimal pre-processing. <br>
-The processing chain includes: 
+The processing chain includes:
 
 - **Coarse spatial bands registration**: it is a simple but coarse bands registration technique based on the solution described in the [THRawS](https://arxiv.org/abs/2305.11891) paper. The coregistration technique is lightweight and consists of a simple spatial shift that compensates the average [along-track, across-track] displacements between each couple of bands. The coarse band registratio is performed in an onboard processor.
 
@@ -152,12 +161,12 @@ The processing chain includes:
 
 - **AI inference**: the `AI engine` consists of a trained AI EfficientNet-lite-0 model that processes the cropped 256x256 patches. After being compiled through the dedicated [workflow](#workflow-to-implement-a-trained-model-on-the-edge-device), the dedicated `OpenVino IR` file can be deployed on the `Intel NCS2` or `CogniSat` board.
 
-- **Mosaicking**: the results are, then, mosaicked to allineate each prediction to each corresponding patch. 
+- **Mosaicking**: the results are, then, mosaicked to allineate each prediction to each corresponding patch.
 
-The onboard payload prototype processing chain can be now profiled to measure the total processing time. 
+The onboard payload prototype processing chain can be now profiled to measure the total processing time.
 
 ## Contributing
-The ```END2END``` project is open to contributions. To discuss new ideas and applications, please, reach us via email (please, refer to [Contact](#contact)). To report a bug or request a new feature, please, open an [issue](https://github.com/GabrieleMeoni/END2END/issues) to report a bug or to request a new feature. 
+The ```END2END``` project is open to contributions. To discuss new ideas and applications, please, reach us via email (please, refer to [Contact](#contact)). To report a bug or request a new feature, please, open an [issue](https://github.com/GabrieleMeoni/END2END/issues) to report a bug or to request a new feature.
 
 If you want to contribute, please proceed as follow:
 

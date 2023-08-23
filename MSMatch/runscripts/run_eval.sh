@@ -20,6 +20,5 @@ LOAD_PATH="/data/PyDeepLearning/END2END/MSMatch/checkpoints/iter2/thraws_swir_tr
 cd $FIXMATCH_FOLDER
 echo -e "Using GPU ${RED} $CUDA_VISIBLE_DEVICES ${BLACK}."
 
-
 #Remove "echo" to launch the script.
 python eval.py --load_path $LOAD_PATH --net $NET --batch_size $BATCH_SIZE --dataset $DATASET --seed $SEED $CONFUSION_MATRIX 
