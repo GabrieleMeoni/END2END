@@ -14,7 +14,7 @@ import numpy as np
 from torch.nn.functional import pad
 
 
-class oboardDetectorProcessor:
+class onboardDetectorProcessor:
     def __init__(
         self,
         satellite,
