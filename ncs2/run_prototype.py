@@ -49,14 +49,14 @@ def main():
     parser.add_argument(
         "--dataset_path",
         type=str,
-        default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\onboard_prototype\my_dir",
+        default="onboard_prototype/my_dir",
     )
 
     # ONNX ARGUMENTS
     parser.add_argument(
         "--ir_path",
         type=str,
-        default=r"C:\Users\meoni\Documents\ESA\Projects\END2END\ncs2\output\efficientnet-lite0.xml",
+        default="ncs2/output/efficientnet-lite0.xml",
     )
 
     # OUTPUT DIRECTORY ARGUMENTS
