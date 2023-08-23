@@ -18,7 +18,7 @@ def main():
     parser.add_argument(
         "--dataset_path",
         type=str,
-        default="onboard_prototype\my_dir",
+        default="onboard_prototype/my_dir",
     )
 
     # DETECTOR PROCESSOR ARGUMENTS
