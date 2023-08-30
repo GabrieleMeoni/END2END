@@ -85,36 +85,6 @@ COREGISTRATION_DICT_OPTIMIZED = {
     },
 }
 
-COREGISTRATION_DICT = {
-    "S2A": {
-        1: [[177.0, 14.0], [-22.0, 14.0]],
-        2: [[-185.0, 16.0], [16.0, 14.0]],
-        3: [[174.0, 13.0], [-22.0, 14.0]],
-        4: [[-182.0, 15.0], [16.0, 13.0]],
-        5: [[172.0, 13.0], [-23.0, 13.0]],
-        6: [[-183.0, 12.0], [15.0, 12.0]],
-        7: [[173.0, 12.0], [-22.0, 12.0]],
-        8: [[-183.0, 12.0], [15.0, 12.0]],
-        9: [[172.0, 11.0], [-24.0, 11.0]],
-        10: [[-186.0, 9.0], [15.0, 12.0]],
-        11: [[175.0, 11.0], [-24.0, 11.0]],
-        12: [[-191.0, 6.0], [15.0, 11.0]],
-    },
-    "S2B": {
-        1: [[174.0, 2.0], [-25.0, 3.0]],
-        2: [[-187.0, 5.0], [14.0, 3.0]],
-        3: [[172.0, 3.0], [-24.0, 3.0]],
-        4: [[-184.0, 4.0], [14.0, 2.0]],
-        5: [[171.0, 2.0], [-24.0, 2.0]],
-        6: [[-185.0, 2.0], [13.0, 2.0]],
-        7: [[170.0, 1.0], [-24.0, 1.0]],
-        8: [[-185.0, 1.0], [13.0, 1.0]],
-        9: [[171.0, 1.0], [-25.0, 1.0]],
-        10: [[-187.0, -2.0], [12.0, 1.0]],
-        11: [[-187.0, -2.0], [12.0, 1.0]],
-        12: [[-187.0, -2.0], [12.0, 1.0]],
-    },
-}
 
 # S2 detector full scale
 S2_DETECTOR_FS = 4095
@@ -129,6 +99,19 @@ def coarse_coregistration(
     X_prev=None,
     crop_empty_pixels=False,
 ):
+    """Applying coarse coregistration.
+
+    Args:
+        X (torch.tensor): bands to register.
+        satellite (str): satellite name.
+        granule_detector_number (int): detector number.
+        rotate_swir_bands (bool, optional): if True, SWIR bands are rotated. Defaults to True.
+        X_prev (torch.tensor, optional): previous granules used to fill missing pixels. If None, missing pixels are/are not cropped depending on crop_empty_pixels. Defaults to None.
+        crop_empty_pixels (bool, optional): if True and X_prev is None, missing pixels due to registration are cropped. Defaults to False.
+
+    Returns:
+        torch.tensor: coarsely registered granule.
+    """
     granule_detector_number = int(granule_detector_number)
 
     def apply_shift(band, shifts):
@@ -254,184 +237,19 @@ def coarse_coregistration(
     return coregistered_bands_tensor
 
 
-def coarse_coregistration_other(
-    X,
-    satellite,
-    granule_detector_number,
-    rotate_swir_bands=True,
-    X_prev=None,
-    crop_empty_pixels=False,
-):
-    granule_detector_number = int(granule_detector_number)
 
-    def shift_band(band, shifts):
-        band_shifted = torch.zeros_like(band)
-        shifts = [int(shifts[0]), int(shifts[1])]
-        if (shifts[0] == 0) and (shifts[1] == 0):
-            band_shifted = band
-        elif (shifts[0] == 0) and (shifts[1] < 0):
-            band_shifted[:, : int(shifts[1])] = band[:, -int(shifts[1]) :]
-        elif (shifts[0] == 0) and (shifts[1] > 0):
-            band_shifted[:, int(shifts[1]) :] = band[:, : -int(shifts[1])]
-        elif (shifts[0] < 0) and (shifts[1] == 0):
-            band_shifted[: int(shifts[0]), :] = band[-int(shifts[0]) :, :]
-        elif (shifts[0] > 0) and (shifts[1] == 0):
-            band_shifted[int(shifts[0]) :, :] = band[: -int(shifts[0]), :]
-        elif (shifts[0] > 0) and (shifts[1] > 0):
-            band_shifted[int(shifts[0]) :, int(shifts[1]) :] = band[
-                : -int(shifts[0]), : -int(shifts[1])
-            ]
-        elif (shifts[0] > 0) and (shifts[1] < 0):
-            band_shifted[int(shifts[0]) :, : int(shifts[1])] = band[
-                : -int(shifts[0]), -int(shifts[1]) :
-            ]
-        elif (shifts[0] < 0) and (shifts[1] > 0):
-            band_shifted[: int(shifts[0]), int(shifts[1]) :] = band[
-                -int(shifts[0]) :, : -int(shifts[1])
-            ]
-        else:
-            band_shifted[: int(shifts[0]), : int(shifts[1])] = band[
-                -int(shifts[0]) :, -int(shifts[1]) :
-            ]
-
-        return band_shifted
-
-    def shifts2TBLT(along_track: int, cross_track: int):
-        """Transforms along and cross track offsets into top, bottom, left and right offsets
-        Args:
-            along_track (int): The offset in the along track direction
-            cross_track (int): The offset in the cross track direction
-
-        Returns:
-            Shifts offset in top, bottom, left, right
-        """
-        top, left, right, bottom = 0, 0, 0, 0
-        if along_track < 0:
-            bottom = abs(along_track)
-        elif along_track > 0:
-            top = abs(along_track)
-        if cross_track > 0:
-            left = abs(cross_track)
-        elif cross_track < 0:
-            right = abs(cross_track)
-
-        return top, bottom, left, right
-
-    def maxOffsetUpdate(
-        max_top: int,
-        max_bottom: int,
-        max_left: int,
-        max_right: int,
-        top: int,
-        bottom: int,
-        left: int,
-        right: int,
-    ):
-        if top > max_top:
-            max_top = top
-
-        if bottom > max_bottom:
-            max_bottom = bottom
-
-        if right > max_right:
-            max_right = right
-
-        if left > max_left:
-            max_left = left
-
-        return max_top, max_bottom, max_left, max_right
-
-    # Get shifts
-    bands_shifts = COREGISTRATION_DICT[satellite][granule_detector_number]
-
-    coregistered_bands = []
-    max_top, max_bottom, max_left, max_right = 0, 0, 0, 0  # Maximum of offsets init.
-
-    # Assigning to None and changed later if needed.
-    filler_found = {"top": None, "bottom": None}
-    for n in range(3):
-        band = X[n]
-
-        # No shift for the first band.
-        if n == 0:
-            coregistered_bands.append(band)  # MASTER BAND
-
-        else:
-            if rotate_swir_bands:
-                band = rotate(band.unsqueeze(2), 180).squeeze(2)
-
-            along_track, cross_track = bands_shifts[n - 1]
-            top, bottom, left, right = shifts2TBLT(
-                along_track, cross_track
-            )  # Shfits to top, bottom, right, left
-            max_top, max_bottom, max_left, max_right = maxOffsetUpdate(
-                max_top, max_bottom, max_left, max_right, top, bottom, left, right
-            )
-            band_shifted = shift_band(band, shifts=[along_track, cross_track])
-
-            # ------------------------------- Filling:
-            if X_prev is not None:
-                band_filler = X_prev[n]
-                if (n > 0) and (rotate_swir_bands):
-                    band_filler = rotate(band_filler.unsqueeze(2), 180).squeeze(2)
-
-                band_filler = shift_band(band_filler, shifts=[0, cross_track])
-                if granule_detector_number % 2:
-                    # Band filler is on top:
-                    if top != 0:
-                        band_shifted[: int(top), :] = band_filler[-int(top) :, :]
-                        filler_found["top"] = True
-                else:
-                    if bottom != 0:
-                        band_shifted[-int(bottom) :, :] = band_filler[: int(bottom), :]
-                        filler_found["bottom"] = True
-
-            coregistered_bands.append(band_shifted)
-
-    # Managing crop exmpty pixel case
-    if crop_empty_pixels:
-        for n in range(len(coregistered_bands)):
-            band = coregistered_bands[n]
-            # The band shall be cropped only if it has not been filled.
-            if (filler_found["bottom"] is None) and (max_bottom != 0):
-                band_cropped = band[: -int(max_bottom)]
-            else:
-                band_cropped = band
-
-            # The band shall be cropped only if it has not been filled.
-            if (filler_found["top"] is None) and (max_top != 0):
-                band_cropped = band_cropped[int(max_top) :]
-
-            if max_right != 0:
-                band_cropped = band_cropped[:, int(max_left) : -int(max_right)]
-            else:
-                band_cropped = band_cropped[:, int(max_left) :]
-
-            if n == 0:
-                coregistered_bands_tensor = torch.zeros(
-                    [
-                        len(coregistered_bands),
-                        band_cropped.shape[0],
-                        band_cropped.shape[1],
-                    ]
-                ).to(X.device)
-
-            coregistered_bands_tensor[n] = band_cropped
-    else:
-        coregistered_bands_tensor = torch.zeros(
-            [
-                len(coregistered_bands),
-                coregistered_bands[0].shape[0],
-                coregistered_bands[0].shape[1],
-            ]
-        )
-        for n in range(len(coregistered_bands)):
-            coregistered_bands_tensor[n] = coregistered_bands[n]
-    return coregistered_bands_tensor
 
 
 # Load single data
 def load_single_data(data_dir):
+    """Load a single data and returns a tuple containing of data, metadata.
+
+    Args:
+        data_dir (str): path to a granule directory.
+
+    Returns:
+        tuple: (granule data, event name, granule number, satellite name, detector number).
+    """
     info = data_dir.split("_")
     detector_number = info[-1]
     granule_number = info[-3]
@@ -456,8 +274,16 @@ def load_single_data(data_dir):
     )
 
 
-# Load data and cluster them according to event : {detector_number : { granule_number : data}}
+
 def load_data(data_dir):
+    """Load data and cluster them according to event : {detector_number : { granule_number : data}}
+
+    Args:
+        data_dir (str): directory containing all the granules.
+
+    Returns:
+        dictionary: event : {detector_number : { granule_number : data}}.
+    """
     data_dirs = glob(os.path.join(data_dir, "*"))
     event_list = []
     event_info = []
