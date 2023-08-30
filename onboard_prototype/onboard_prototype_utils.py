@@ -237,9 +237,6 @@ def coarse_coregistration(
     return coregistered_bands_tensor
 
 
-
-
-
 # Load single data
 def load_single_data(data_dir):
     """Load a single data and returns a tuple containing of data, metadata.
@@ -272,7 +269,6 @@ def load_single_data(data_dir):
         satellite,
         detector_number,
     )
-
 
 
 def load_data(data_dir):

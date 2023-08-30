@@ -74,8 +74,7 @@ class onboardDetectorProcessor:
         self.device = device
 
     def flush(self):
-        """Flush function to reset the prototype. It sets to None internal variables.
-        """
+        """Flush function to reset the prototype. It sets to None internal variables."""
         self.x_coreg_pad = None
         self.x_prev = None
 
