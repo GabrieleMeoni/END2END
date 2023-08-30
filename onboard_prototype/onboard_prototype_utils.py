@@ -106,8 +106,11 @@ def coarse_coregistration(
         satellite (str): satellite name.
         granule_detector_number (int): detector number.
         rotate_swir_bands (bool, optional): if True, SWIR bands are rotated. Defaults to True.
-        X_prev (torch.tensor, optional): previous granules used to fill missing pixels. If None, missing pixels are/are not cropped depending on crop_empty_pixels. Defaults to None.
-        crop_empty_pixels (bool, optional): if True and X_prev is None, missing pixels due to registration are cropped. Defaults to False.
+        X_prev (torch.tensor, optional): previous granules used to fill missing pixels.
+                                        If None, missing pixels are/are not cropped depending on crop_empty_pixels.
+                                        Defaults to None.
+        crop_empty_pixels (bool, optional): if True and X_prev is None, missing pixels due to registration are cropped.
+                                            Defaults to False.
 
     Returns:
         torch.tensor: coarsely registered granule.
