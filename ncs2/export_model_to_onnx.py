@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.insert(1, os.path.join("..", "..", "MSMatch"))
+sys.path.insert(1, os.path.join("..", "MSMatch"))
 import torch
 import argparse
 from datasets.ssl_dataset import SSL_Dataset

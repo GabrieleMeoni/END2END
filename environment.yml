@@ -30,3 +30,4 @@ dependencies:
 - pip:
   - efficientnet_lite_pytorch
   - efficientnet_lite0_pytorch_model
+  - opencv-python
