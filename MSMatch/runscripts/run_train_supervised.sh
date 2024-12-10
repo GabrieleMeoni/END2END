@@ -1,8 +1,8 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=4
+export CUDA_VISIBLE_DEVICES=0
 DEVICE=0
-FIXMATCH_FOLDER="/home/gabrielemeoni/project/END2END/MSMatch/"
-SAVE_LOCATION="/home/gabrielemeoni/project/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
+FIXMATCH_FOLDER="/home/roberto/PythonProjects/END2END/MSMatch/"
+SAVE_LOCATION="/home/roberto/PythonProjects/END2END/MSMatch/checkpoints/" #Where tensorboard output will be written
 SAVE_DIR="final_train_supervised"                             
 
 DATASET="thraws_swir_train"   #Dataset to use: Options are eurosat_ms, eurosat_rgb, aid, ucm
