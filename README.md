@@ -183,5 +183,5 @@ Distributed under the GPL-3.0 License.
 ## Contact
 Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/) in collaboration with [Space Systems Engineering, Technical University of Delft](https://www.tudelft.nl/lr/organisatie/afdelingen/space-engineering/space-systems-engineering).
 
-* Gabriele Meoni - Currently with TU Delft: G.Meoni@tudelft.nl
+* Gabriele Meoni - Currently with ESA: gabriele.meoni@esa.int
 * Roberto Del Prete - roberto.delprete at ext.esa.int
