@@ -126,7 +126,7 @@ Everytime you need to use ```export_to_openvino.py```, remember to activate the 
 The dataset used for END2END is based on [THRawS](https://arxiv.org/abs/2305.11891). `THRawS` (Thermal Hotspots on Raw Sentinel-2 data) is a Sentinel-2 dataset containing raw granules including annotated thermal anomalies. <br>
 In particular:
 - to train the model, the bands [`B8A`, `B11`, `B12`] of the various granules of `THRawS` was preprocessed to extract 256x256 patches for thermal anomalies classification. To this aim, `ROBERTO TO COMPLETE`.
-The patch classification dataset can be downloaded from [here (temporary)](https://drive.google.com/drive/folders/1Fa6-3_mW7-4V_gMIehxq0qU4Epn3WxyB?usp=drive_link). **N.B.** you might need to request access.
+The patch classification dataset can be downloaded from [here]([https://drive.google.com/drive/folders/1Fa6-3_mW7-4V_gMIehxq0qU4Epn3WxyB?usp=drive_link](https://huggingface.co/datasets/sirbastiano94/END2END/blob/main/README.md)).
 
 - for the [onboard payload prototype](#onboard-payload-prototype), the bands [`B8A`, `B11`, `B12`] of [Sentinel-2 Raw granules](https://github.com/ESA-PhiLab/PyRawS#sentinel-2-raw-granule) are grouped in a [TIF](https://en.wikipedia.org/wiki/TIFF) file, representing an easy-to-read version of the THRawS granules without metadata.
 
@@ -183,5 +183,5 @@ Distributed under the GPL-3.0 License.
 ## Contact
 Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/) in collaboration with [Space Systems Engineering, Technical University of Delft](https://www.tudelft.nl/lr/organisatie/afdelingen/space-engineering/space-systems-engineering).
 
-* Gabriele Meoni - Currently with ESA: gabriele.meoni@esa.int
-* Roberto Del Prete - roberto.delprete at ext.esa.int
+* Gabriele Meoni - Currently with ESA: gabriele.meoni at esa.int
+* Roberto Del Prete - roberto.delprete at esa.int
