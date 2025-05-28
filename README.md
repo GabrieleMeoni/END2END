@@ -181,7 +181,7 @@ If you want to contribute, please proceed as follow:
 Distributed under the GPL-3.0 License.
 
 ## Contact
-Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/) in collaboration with [Space Systems Engineering, Technical University of Delft](https://www.tudelft.nl/lr/organisatie/afdelingen/space-engineering/space-systems-engineering).
+Created by the European Space Agency $\Phi$-[lab](https://phi.esa.int/) in collaboration with [Space Systems Engineering, Technical University of Delft](https://www.tudelft.nl/lr/organisatie/afdelingen/space-engineering/space-systems-engineering), and  [Ubotica Technologies](https://ubotica.com/).
 
 * Gabriele Meoni - Currently with ESA: gabriele.meoni at esa.int
 * Roberto Del Prete - roberto.delprete at esa.int
